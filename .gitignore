@@ -6,13 +6,10 @@
 .history
 .lib/
 dist/*
-datacleanup/target/
+datacleanup/target/*
 lib_managed/
 src_managed/
 project/boot/
 project/plugins/project/
 datacleanup/project/target/
-datacleanup/project/.idea/*
-# Scala-IDE specific
-.scala_dependencies
-.worksheet
+datacleanup/project/.idea/
