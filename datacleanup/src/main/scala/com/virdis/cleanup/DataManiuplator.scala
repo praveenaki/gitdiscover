@@ -6,7 +6,7 @@ import Constants._
 /**
   * Created by sandeep on 1/19/16.
   */
-trait DataCleanUp {
+trait DataManipulator {
 
   def getAllUserNames(df: DataFrame): DataFrame = df.select( df("actor")("login") )
 
@@ -50,7 +50,7 @@ trait DataCleanUp {
           filterByEventDF.select("created_at"),
           filterByEventDF.select(filterByEventDF("repo")("name")),
           filterByEventDF.select(filterByEventDF("payload")("pull_request")("user")("login")),
-          filterByEventDF.select(filterByEventDF("payload")("pull_request")("repo")),
+          filterByEventDF.select(filterByEventDF("payload")("pull_request")("head")("repo")),
           filterByEventDF.select("org")
         )
       }
