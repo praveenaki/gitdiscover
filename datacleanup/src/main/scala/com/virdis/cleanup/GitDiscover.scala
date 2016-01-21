@@ -18,7 +18,7 @@ object GitDiscover {
 
     object gitMetrics extends Queries with DataManipulator
 
-    val df = sqlContext.read.json("hdfs://52.34.172.205:9000/gitData/JanFirstWeek.json")
+    val df = sqlContext.read.json("hdfs://52.34.172.205:9000/gitData/Jan15Days.json")
 
     gitMetrics.joinAcrossEventsByLangRepo(df)(sqlContext).take(10).foreach(println)
 
