@@ -11,8 +11,11 @@ import org.apache.spark.sql.SQLContext
 trait Queries {
   self: DataManipulator =>
 
+  /*
+      Hypotheses to test: should sort after each join, or at the end. !!!!
+   */
   def countEventsByRepo(eventType: String, df: DataFrame) = {
-    getDataByEventType(df, eventType).groupBy("repo.name").agg(count("repo.name").alias("total"))
+    getDataByEventType(df, eventType).groupBy("repo.name").agg(count("repo.name").alias("total")).sort(desc("total"))
   }
 
 
@@ -38,17 +41,31 @@ trait Queries {
     sQLContext.createDataFrame(sumAllIPWEvent,  new StructType(
       Array(
         StructField("name", StringType),
-        StructField("total", LongType)
+        StructField("ipwTotals", LongType)
       )
-    ))
+    )).sort(desc("ipwTotals"))
   }
 
   def pullReqsByLangRepo(df: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
     val pullReqs = getDataByEventType(df, PULL_REQUEST_EVENT)
     pullReqs.select(pullReqs("repo.name"),
-      pullReqs("payload.pull_request.base.repo.language")).groupBy("language","name").agg( count("language") )
+      pullReqs("payload.pull_request.base.repo.language"))
+      .groupBy("language","name").agg( count("language").as("pullTotals") ).sort(desc("pullTotals"))
 
   }
 
+  def joinAcrossEventsByLangRepo(df: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
+    val total = totalIssuePushWatchEventsByRepo(df).join(pullReqsByLangRepo(df), "name").map {
+      row =>
+        Row(row.getString(0), row.getString(2), row.getAs[Long](1) + row.getAs[Long](3) )
+    }
+    sQLContext.createDataFrame(total, new StructType(
+      Array(
+        StructField("name", StringType),
+        StructField("language", StringType),
+        StructField("eventsTotal", LongType)
+      )
+    )).sort(desc("eventsTotal"))
+  }
 
 }

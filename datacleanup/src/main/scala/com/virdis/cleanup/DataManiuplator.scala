@@ -14,10 +14,10 @@ trait DataManipulator {
     df.filter( df("type") === eventType )
 
 
-  def splitDataByEventType(eventType: String, df: DataFrame): GitData = {
+  /*def splitDataByEventType(eventType: String, df: DataFrame): GitData = {
     val filterByEventDF = getDataByEventType(df, eventType)
     eventType.toLowerCase match {
-      case COMMIT_COMMENT_EVENT.toLowerCase => {
+      case (COMMIT_COMMENT_EVENT.toLowerCase) => {
         CommitCommentEventData(eventType,
           filterByEventDF.select(filterByEventDF("payload")("comment")),
           filterByEventDF.select("created_at"),
@@ -71,5 +71,5 @@ trait DataManipulator {
           filterByEventDF.select("org")
         )
     }
-  }
+  } */
 }
