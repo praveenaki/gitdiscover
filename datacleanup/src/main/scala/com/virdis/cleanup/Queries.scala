@@ -15,7 +15,7 @@ trait Queries {
       Hypotheses to test: should sort after each join, or at the end. !!!!
    */
   def countEventsByRepo(eventType: String, df: DataFrame) = {
-    getDataByEventType(df, eventType).groupBy("repo.name").agg(count("repo.name").alias("total")).sort(desc("total"))
+    getDataByEventType(df, eventType).groupBy("repo.name").agg(count("repo.name").alias("total"))
   }
 
 
@@ -43,14 +43,14 @@ trait Queries {
         StructField("name", StringType),
         StructField("ipwTotals", LongType)
       )
-    )).sort(desc("ipwTotals"))
+    ))
   }
 
   def pullReqsByLangRepo(df: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
     val pullReqs = getDataByEventType(df, PULL_REQUEST_EVENT)
     pullReqs.select(pullReqs("repo.name"),
       pullReqs("payload.pull_request.base.repo.language"))
-      .groupBy("language","name").agg( count("language").as("pullTotals") ).sort(desc("pullTotals"))
+      .groupBy("language","name").agg( count("language").as("pullTotals") )
 
   }
 
