@@ -9,8 +9,9 @@ dist/*
 datacleanup/target/*
 lib_managed/
 src_managed/
-project/boot/
-project/plugins/project/
+datacleanup/project/boot/
+datacleanup/project/plugins/project/
 datacleanup/project/target/
 datacleanup/project/.idea/
 datacleanup/.idea/
+datacleanup/project/project/
