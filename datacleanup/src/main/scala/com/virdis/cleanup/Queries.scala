@@ -49,10 +49,8 @@ trait Queries {
   def pullReqsByLangRepo(df: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
     val pullReqs = getDataByEventType(df, PULL_REQUEST_EVENT)
     pullReqs.select(pullReqs("repo.name"),
-      pullReqs("payload.pull_request.base.repo.language"))
-
-
-      pullReqs.filter( pullReqs("language").isNotNull ).groupBy("language","name").agg( count("language").as("pullTotals") )
+      pullReqs("payload.pull_request.base.repo.language")).filter(pullReqs("payload.pull_request.base.repo.language").isNotNull)
+      .groupBy("language","name").agg( count("language").as("pullTotals") )
 
   }
 
