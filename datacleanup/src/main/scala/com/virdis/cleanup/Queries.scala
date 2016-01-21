@@ -43,17 +43,14 @@ trait Queries {
         StructField("name", StringType),
         StructField("ipwTotals", LongType)
       )
-    ))
+    )).sort(desc("ipwTotals"))
   }
 
   def pullReqsByLangRepo(df: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
     val pullReqs = getDataByEventType(df, PULL_REQUEST_EVENT)
     pullReqs.select(pullReqs("repo.name"),
       pullReqs("payload.pull_request.base.repo.language"))
-
-    val nonNullPullReqs =   pullReqs.filter(pullReqs("language").isNotNull)
-              .groupBy("language","name").agg( count("language").as("pullTotals") )
-    nonNullPullReqs
+      .groupBy("language","name").agg( count("language").as("pullTotals") ).sort(desc("pullTotals"))
 
   }
 

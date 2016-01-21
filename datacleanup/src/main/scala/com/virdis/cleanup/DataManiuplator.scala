@@ -10,8 +10,10 @@ trait DataManipulator {
 
   def getAllUserNames(df: DataFrame): DataFrame = df.select( df("actor")("login") )
 
-  def getDataByEventType(df: DataFrame, eventType: String): DataFrame =
-    df.filter( df("type") === eventType )
+  def getDataByEventType(df: DataFrame, eventType: String): DataFrame = {
+    if (eventType != PULL_REQUEST_EVENT) df.filter( df("type") === eventType )
+    else df.filter((df("filter") === eventType) && (df("payload.pull_request.base.repo.language").isNotNull))
+  }
 
 
   /*def splitDataByEventType(eventType: String, df: DataFrame): GitData = {
