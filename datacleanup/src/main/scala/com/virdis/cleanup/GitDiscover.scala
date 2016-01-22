@@ -1,7 +1,7 @@
 package com.virdis.cleanup
 
 import com.datastax.spark.connector.cql.CassandraConnector
-import org.apache.spark.sql.{Row, SQLContext}
+import org.apache.spark.sql.{SaveMode, Row, SQLContext}
 import org.apache.spark.{SparkContext, SparkConf}
 import com.datastax.spark.connector._
 
@@ -28,7 +28,7 @@ object GitDiscover {
 
     try {
       topPrjs.write.format("org.apache.spark.sql.cassandra")
-        .options(Map("table" -> "repos", "keyspace" -> "gitproject")).save()
+        .options(Map("table" -> "repos", "keyspace" -> "gitproject")).mode(SaveMode.Append).save()
 
     } catch {
       case e: Exception =>
