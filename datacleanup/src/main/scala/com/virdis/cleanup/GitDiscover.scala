@@ -27,7 +27,7 @@ object GitDiscover {
 
     topPrjs.map {
       r =>
-        Row(r.getString(1), r.getString(0), r.getAs[Long](3))
+        Row(r.getAs[String](1), r.getAs[String](0), r.getAs[Long](3))
     }.saveToCassandra("git_project","repos", SomeColumns("language","name","eventsTotal"))
 
   }
