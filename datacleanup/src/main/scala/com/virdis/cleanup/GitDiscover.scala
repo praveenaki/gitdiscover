@@ -24,10 +24,10 @@ object GitDiscover {
     val df = sqlContext.read.json("hdfs://52.34.172.205:9000/gitData/Jan15Days.json")
 
     val topPrjs = gitMetrics.joinAcrossEventsByLangRepo(df)(sqlContext)
-
+    
     topPrjs.map {
       r =>
-        Row(r.getAs[String](1), r.getAs[String](0), r.getAs[Long](3))
+        (r.getAs[String](1), r.getAs[String](0), r.getAs[Long](3))
     }.saveToCassandra("git_project","repos", SomeColumns("language","name","eventsTotal"))
 
   }
