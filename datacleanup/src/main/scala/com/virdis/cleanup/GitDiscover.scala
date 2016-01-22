@@ -26,7 +26,17 @@ object GitDiscover {
 
     val topPrjs = gitMetrics.joinAcrossEventsByLangRepo(df)(sqlContext)
 
-    topPrjs.write.format("org.apache.spark.sql.cassandra").options(Map("table" -> "repos", "keyspace" -> "gitproject")).save()
+    try {
+      topPrjs.write.format("org.apache.spark.sql.cassandra")
+        .options(Map("table" -> "repos", "keyspace" -> "gitproject")).save()
 
+    } catch {
+      case e: Exception =>
+        println("Exe: ====== "+e.printStackTrace())
+        println("Message :  ======= " +e.getMessage)
+        println("Details "+e.getCause)
+        e.fillInStackTrace()
+
+    }
   }
 }
