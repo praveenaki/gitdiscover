@@ -65,7 +65,7 @@ trait Queries {
         StructField("language", StringType),
         StructField("eventstotal", LongType)
       )
-    )).sort(desc("eventsTotal"))
+    )).sort(desc("eventstotal"))
   }
 
 }
