@@ -12,7 +12,7 @@ object GitDiscover {
   def main(args: Array[String]){
 
     val conf = new SparkConf(true)
-                .set("spark.cassandra.connection.host","52.88.244.205")
+                .set("spark.cassandra.connection.host","52.35.99.109")
                 .setAppName("GitDiscover")
 
     val sc = new SparkContext(conf)
