@@ -25,10 +25,10 @@ object GitDiscover {
 
     val topPrjs = gitMetrics.joinAcrossEventsByLangRepo(df)(sqlContext)
 
-    topPrjs.map {
-      r =>
-        (r.getAs[String](1), r.getAs[String](0), r.getAs[Long](3))
-    }.saveToCassandra("git_project","repos", SomeColumns("language","name","eventstotal"))
+    topPrjs.createCassandraTable("gitproject","repos",
+      partitionKeyColumns = Some(Seq("language")),
+      clusteringKeyColumns = Some(Seq("name", "eventstotal"))
+    )
 
   }
 }
