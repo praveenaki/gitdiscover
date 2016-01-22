@@ -1,5 +1,6 @@
 package com.virdis.cleanup
 
+import com.datastax.spark.connector.cql.CassandraConnector
 import org.apache.spark.sql.{Row, SQLContext}
 import org.apache.spark.{SparkContext, SparkConf}
 import com.datastax.spark.connector._
@@ -25,10 +26,7 @@ object GitDiscover {
 
     val topPrjs = gitMetrics.joinAcrossEventsByLangRepo(df)(sqlContext)
 
-    topPrjs.createCassandraTable("gitproject","repos",
-      partitionKeyColumns = Some(Seq("language")),
-      clusteringKeyColumns = Some(Seq("name", "eventstotal"))
-    )
+    topPrjs.write.format("org.apache.spark.sql.cassandra").options(Map("table" -> "repos", "keyspace" -> "test")).save()
 
   }
 }
