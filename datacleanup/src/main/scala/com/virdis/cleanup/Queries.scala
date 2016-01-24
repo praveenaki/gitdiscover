@@ -15,10 +15,10 @@ trait Queries {
       Hypotheses to test: should sort after each join, or at the end. !!!!
    */
   def countEventsByRepo(eventType: String, df: DataFrame) = {
-    getDataByEventType(df, eventType).groupBy("repo.name").agg(count("repo.name").alias("total"))
+    getDataByEventType(df, eventType).groupBy(REPO_NAME_COLUMN_NAME).agg(count(REPO_NAME_COLUMN_NAME).alias(TOTAL_COLUMN))
   }
 
-  def joinReposByName(df1: DataFrame, df2: DataFrame, newColName: String)(implicit sqlContext: SQLContext): DataFrame = {
+  def joinSimilarStructureReposByName(df1: DataFrame, df2: DataFrame, newColName: String)(implicit sqlContext: SQLContext): DataFrame = {
     val result = df1.join(df2, NAME_COLUMN).map {
       row =>
         Row(row.getString(0), row.getAs[Long](1) + row.getAs[Long](2))
@@ -33,28 +33,34 @@ trait Queries {
   }
 
 
-  def totalIssuePushWatchEventsByRepo(df: DataFrame)(implicit sqlContext: SQLContext): DataFrame = {
+  def countOfSimilarStructureEventsByRepo(df: DataFrame)(implicit sqlContext: SQLContext): DataFrame = {
     val pushEventsByRepo = countEventsByRepo(PUSH_EVENT, df)
     val watchEventsByRepo = countEventsByRepo(WATCH_EVENT, df)
     val issueEventsByRepo = countEventsByRepo(ISSUES_EVENT, df)
     val commitCommentsByRepo = countEventsByRepo(COMMIT_COMMENT_EVENT, df)
-    val forksByRepo = countEventsByRepo()
-    val pushWatchDF = joinReposByName(pushEventsByRepo, watchEventsByRepo, "total")
-    val issuePushWatchDF = joinReposByName(issueEventsByRepo, pushWatchDF, "ipwTotal")
-    val cipwDF = joinReposByName(commitCommentsByRepo, issuePushWatchDF, "cipwTotal")
+    val forksByRepo = countEventsByRepo(FORK_EVENT, df)
+    val issueCommentsByRepo = countEventsByRepo(ISSUE_COMMENT_EVENT, df)
 
+    val pushWatchDF = joinSimilarStructureReposByName(pushEventsByRepo, watchEventsByRepo, "total")
+    val issuePushWatchDF = joinSimilarStructureReposByName(issueEventsByRepo, pushWatchDF, "ipwTotal")
+    val cipwDF = joinSimilarStructureReposByName(commitCommentsByRepo, issuePushWatchDF, "cipwTotal")
+    val fcipwDF = joinSimilarStructureReposByName(forksByRepo, cipwDF, "fcipwTotal")
+    val icfcipwDF = joinSimilarStructureReposByName(issueCommentsByRepo, fcipwDF, "icfcipw")
+    icfcipwDF
   }
+
 
   def pullReqsByLangRepo(df: DataFrame)(implicit sqlContext: SQLContext): DataFrame = {
     val pullReqs = getDataByEventType(df, PULL_REQUEST_EVENT)
-    pullReqs.select(pullReqs("repo.name"),
-      pullReqs("payload.pull_request.base.repo.language"))
-      .groupBy("language","name").agg( count("language").as("pullTotals") ).sort(desc("pullTotals"))
+
+    pullReqs.select(pullReqs(REPO_NAME_COLUMN_NAME),
+      pullReqs(LANGUAGE_COLUMN))
+      .groupBy("language","name").agg( count("language").as("pulltotals") )
 
   }
 
-  def joinAcrossEventsByLangRepo(df: DataFrame)(implicit sqlContext: SQLContext): DataFrame = {
-    val total = totalIssuePushWatchEventsByRepo(df).join(pullReqsByLangRepo(df), "name").map {
+  def topProjectsByLangRepo(df: DataFrame)(implicit sqlContext: SQLContext): DataFrame = {
+    val total = countOfSimilarStructureEventsByRepo(df).join(pullReqsByLangRepo(df), "name").map {
       row =>
         Row(row.getString(0), row.getString(2), row.getAs[Long](1) + row.getAs[Long](3) )
     }

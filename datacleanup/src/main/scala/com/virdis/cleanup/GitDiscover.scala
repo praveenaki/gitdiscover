@@ -24,7 +24,9 @@ object GitDiscover {
 
     val df = sqlContext.read.json("hdfs://52.34.172.205:9000/gitData/Jan15Days.json")
 
-    val topPrjs = gitMetrics.joinAcrossEventsByLangRepo(df)(sqlContext)
+    val topPrjs = gitMetrics.topProjectsByLangRepo(df)(sqlContext)
+
+    topPrjs.foreach(println)
 
     try {
       topPrjs.write.format("org.apache.spark.sql.cassandra")
