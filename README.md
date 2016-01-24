@@ -1,5 +1,4 @@
 # gitDiscover
 
 # Motivation
-
-The idea of the project came as I wanted to scratch a personal itch. Intention of the project is to help people new to programming choose which Git Repositories and Contributors to follow.
+The motivation for the project came to me from my personal experience from trying to suggest follow-worthy github contributors and repositories to newcomers to programming. The end goal for this project would be to conduct some sentiment analysis to figure out which contributors and repositories are most friendly to newcomers.
