@@ -24,3 +24,5 @@ mergeStrategy in assembly := {
   case "reference.conf"                                    => MergeStrategy.concat
   case _                                                   => MergeStrategy.first
 }
+
+mainClass in assembly := Some("com.virdis.cleanup.GitDiscover")
