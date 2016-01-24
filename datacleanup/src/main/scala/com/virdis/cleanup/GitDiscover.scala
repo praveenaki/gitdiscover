@@ -22,11 +22,11 @@ object GitDiscover {
 
     object gitMetrics extends Queries with DataManipulator
 
-    val df = sqlContext.read.json("hdfs://52.34.172.205:9000/gitData/Jan15Days.json")
+    val df = sqlContext.read.json("hdfs://52.34.172.205:9000/gitData/JanFirstWeek.json")
 
     val topPrjs = gitMetrics.topProjectsByLangRepo(df)(sqlContext)
 
-    topPrjs.foreach(println)
+    topPrjs.show()
 
     try {
       topPrjs.write.format("org.apache.spark.sql.cassandra")

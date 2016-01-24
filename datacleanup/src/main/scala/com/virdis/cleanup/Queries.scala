@@ -62,7 +62,7 @@ trait Queries {
   def topProjectsByLangRepo(df: DataFrame)(implicit sqlContext: SQLContext): DataFrame = {
     val total = countOfSimilarStructureEventsByRepo(df).join(pullReqsByLangRepo(df), "name").map {
       row =>
-        Row(row.getString(0), row.getString(2), row.getAs[Long](1) + row.getAs[Long](3) )
+        Row(row.getAs[String](0), row.getAs[String](2), row.getAs[Long](1) + row.getAs[Long](3) )
     }
     sqlContext.createDataFrame(total, new StructType(
       Array(
