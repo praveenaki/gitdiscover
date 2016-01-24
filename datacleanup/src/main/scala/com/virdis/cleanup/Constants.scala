@@ -10,4 +10,7 @@ object Constants {
   val PULL_REQUEST_EVENT = "PullRequestEvent"
   val PUSH_EVENT = "PushEvent"
   val WATCH_EVENT = "WatchEvent"
+  val FORK_EVENT = "ForkEvent"
+
+  val NAME_COLUMN = "name"
 }

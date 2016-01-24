@@ -18,35 +18,34 @@ trait Queries {
     getDataByEventType(df, eventType).groupBy("repo.name").agg(count("repo.name").alias("total"))
   }
 
-
-  def totalIssuePushWatchEventsByRepo(df: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
-    val pushEventsByRepo = countEventsByRepo(PUSH_EVENT, df)
-    val watchEventsByRepo = countEventsByRepo(WATCH_EVENT, df)
-    val issueEventsByRepo = countEventsByRepo(ISSUES_EVENT, df)
-    val sumUpRow = pushEventsByRepo.join(watchEventsByRepo, "name").map {
+  def joinReposByName(df1: DataFrame, df2: DataFrame, newColName: String)(implicit sqlContext: SQLContext): DataFrame = {
+    val result = df1.join(df2, NAME_COLUMN).map {
       row =>
         Row(row.getString(0), row.getAs[Long](1) + row.getAs[Long](2))
     }
-    val sumPushWatchDF = sQLContext.createDataFrame(sumUpRow, new StructType(
+    sqlContext.createDataFrame(result, new StructType(
       Array(
         StructField("name", StringType),
-        StructField("total", LongType)
+        StructField(newColName, LongType)
       )
     ))
 
-    val sumAllIPWEvent = issueEventsByRepo.join(sumPushWatchDF, "name").map {
-      row =>
-        Row(row.getString(0), row.getAs[Long](1) + row.getAs[Long](2))
-    }
-    sQLContext.createDataFrame(sumAllIPWEvent,  new StructType(
-      Array(
-        StructField("name", StringType),
-        StructField("ipwTotals", LongType)
-      )
-    )).sort(desc("ipwTotals"))
   }
 
-  def pullReqsByLangRepo(df: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
+
+  def totalIssuePushWatchEventsByRepo(df: DataFrame)(implicit sqlContext: SQLContext): DataFrame = {
+    val pushEventsByRepo = countEventsByRepo(PUSH_EVENT, df)
+    val watchEventsByRepo = countEventsByRepo(WATCH_EVENT, df)
+    val issueEventsByRepo = countEventsByRepo(ISSUES_EVENT, df)
+    val commitCommentsByRepo = countEventsByRepo(COMMIT_COMMENT_EVENT, df)
+    val forksByRepo = countEventsByRepo()
+    val pushWatchDF = joinReposByName(pushEventsByRepo, watchEventsByRepo, "total")
+    val issuePushWatchDF = joinReposByName(issueEventsByRepo, pushWatchDF, "ipwTotal")
+    val cipwDF = joinReposByName(commitCommentsByRepo, issuePushWatchDF, "cipwTotal")
+
+  }
+
+  def pullReqsByLangRepo(df: DataFrame)(implicit sqlContext: SQLContext): DataFrame = {
     val pullReqs = getDataByEventType(df, PULL_REQUEST_EVENT)
     pullReqs.select(pullReqs("repo.name"),
       pullReqs("payload.pull_request.base.repo.language"))
@@ -54,12 +53,12 @@ trait Queries {
 
   }
 
-  def joinAcrossEventsByLangRepo(df: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
+  def joinAcrossEventsByLangRepo(df: DataFrame)(implicit sqlContext: SQLContext): DataFrame = {
     val total = totalIssuePushWatchEventsByRepo(df).join(pullReqsByLangRepo(df), "name").map {
       row =>
         Row(row.getString(0), row.getString(2), row.getAs[Long](1) + row.getAs[Long](3) )
     }
-    sQLContext.createDataFrame(total, new StructType(
+    sqlContext.createDataFrame(total, new StructType(
       Array(
         StructField("name", StringType),
         StructField("language", StringType),
