@@ -11,11 +11,8 @@ import org.apache.spark.sql.SQLContext
 trait Queries {
   self: DataManipulator =>
 
-  /*
-      Hypotheses to test: should sort after each join, or at the end. !!!!
-   */
   def countEventsByRepo(eventType: String, df: DataFrame) = {
-    getDataByEventType(df, eventType).groupBy(REPO_NAME_COLUMN_NAME).agg(count(REPO_NAME_COLUMN_NAME).alias(TOTAL_COLUMN))
+    getDataByEventType(df, eventType).groupBy(REPO_NAME_COLUMN).agg(count(REPO_NAME_COLUMN).alias(TOTAL_COLUMN))
   }
 
   def joinSimilarStructureReposByName(df1: DataFrame, df2: DataFrame, newColName: String)(implicit sqlContext: SQLContext): DataFrame = {
@@ -53,8 +50,8 @@ trait Queries {
   def pullReqsByLangRepo(df: DataFrame)(implicit sqlContext: SQLContext): DataFrame = {
     val pullReqs = getDataByEventType(df, PULL_REQUEST_EVENT)
 
-    pullReqs.select(pullReqs(REPO_NAME_COLUMN_NAME),
-      pullReqs(LANGUAGE_COLUMN))
+    pullReqs.select(pullReqs(REPO_NAME_COLUMN),
+      pullReqs(PULL_REQ_LANGUAGE_COLUMN))
       .groupBy("language","name").agg( count("language").as("pulltotals") )
 
   }
