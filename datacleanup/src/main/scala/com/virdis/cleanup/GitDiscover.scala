@@ -1,6 +1,7 @@
 package com.virdis.cleanup
 
 import com.datastax.spark.connector.cql.CassandraConnector
+import org.apache.spark.sql.cassandra.CassandraSQLContext
 import org.apache.spark.sql.{SaveMode, Row, SQLContext}
 import org.apache.spark.{SparkContext, SparkConf}
 import com.datastax.spark.connector._
@@ -22,15 +23,19 @@ object GitDiscover {
 
     object gitMetrics extends Queries with DataManipulator
 
-    val df = sqlContext.read.json("hdfs://52.34.172.205:9000/gitData/JanFirstWeek.json")
+    val df = sqlContext.read.json("s3n://sandeep-git-archive/JanFull.json")
 
     val topPrjs = gitMetrics.topProjectsByLangRepo(df)(sqlContext)
-
-    topPrjs.show()
+    
 
     try {
       topPrjs.write.format("org.apache.spark.sql.cassandra")
         .options(Map("table" -> "repos", "keyspace" -> "gitproject")).mode(SaveMode.Append).save()
+
+      topPrjs.map {
+        row =>
+
+      }
 
     } catch {
       case e: Exception =>
@@ -38,7 +43,7 @@ object GitDiscover {
         println("Message :  ======= " +e.getMessage)
         println("Details "+e.getCause)
         e.fillInStackTrace()
-
+        throw e
     }
   }
 }
