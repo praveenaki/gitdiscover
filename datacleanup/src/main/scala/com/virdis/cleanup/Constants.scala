@@ -1,5 +1,6 @@
 package com.virdis.cleanup
 
+import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 
 /**
@@ -72,4 +73,8 @@ object Constants {
 
   ///// SCHEMA /////
   val CREATED_DATE_TIME = DateTimeFormat.forPattern("")
+
+
+  val DATE_FORMAT = DateTimeFormat.forPattern("MM/dd/yyyy")
+  lazy val TODAY = DateTime.now
 }
