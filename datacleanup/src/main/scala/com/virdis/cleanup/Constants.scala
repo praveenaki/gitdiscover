@@ -41,7 +41,7 @@ object Constants {
   ///// SCHEMA /////
  // val CREATED_DATE_TIME = DateTimeFormat.forPattern("MM/dd/yyyy")
 
-
+  val BUCKET_PATH = "s3n://sandeep-git-archive/"
   val DATE_FORMAT = DateTimeFormat.forPattern("MM/dd/yyyy")
   val TODAY = DateTime.now
 }
