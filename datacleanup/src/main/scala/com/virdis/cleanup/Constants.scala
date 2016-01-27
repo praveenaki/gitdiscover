@@ -72,9 +72,9 @@ object Constants {
   val PRCR_COMMENT = "prcrcomment"
 
   ///// SCHEMA /////
-  val CREATED_DATE_TIME = DateTimeFormat.forPattern("")
+ // val CREATED_DATE_TIME = DateTimeFormat.forPattern("MM/dd/yyyy")
 
 
   val DATE_FORMAT = DateTimeFormat.forPattern("MM/dd/yyyy")
-  lazy val TODAY = DateTime.now
+  val TODAY = DateTime.now
 }

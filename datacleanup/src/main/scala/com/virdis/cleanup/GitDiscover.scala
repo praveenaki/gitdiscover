@@ -29,6 +29,7 @@ object GitDiscover {
 
     val topPrjs = gitMetrics.topProjectsByLangRepo(df)(sqlContext)
 
+    topPrjs.show()
 
     try {
       topPrjs.write.format("org.apache.spark.sql.cassandra")
