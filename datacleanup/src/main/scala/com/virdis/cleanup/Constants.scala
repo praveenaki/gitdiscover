@@ -31,46 +31,13 @@ object Constants {
   val ISSUE_COMMENT_EVENT_COLUMN = "payload.comment.body"
   val PULL_REQ_COMMENT_REVIEW_COMMENT_COLUMN = "payload.comment.body"
 
-  val CCE_REPO_NAME = "ccereponame"
-  val CCE_TIME = "ccedate"
-  val CCE_MONTH = "ccemonth"
-  val CCE_CREATED_AT = "ccecreatedat"
-  val CCE_COMMITTER = "ccelogin"
-  val CCE_COMMENT = "ccecomment"
-
-  val I_MONTH = "imonth"
-  val I_TIME = "itime"
-  val I_COMMITTER = "ilogin"
-  val I_COMMENT ="icomment"
-
-  val PR_MONTH = "pmonth"
-  val PR_TIME = "prtime"
-  val PR_COMMITTER = "prlogin"
-  val PR_COMMENT = "prcomment"
-
-  val PSH_MONTH = "pshmonth"
-  val PSH_TIME = "pshtime"
-  val PSH_COMMITTER = "pshlogin"
-  val PSH_COMMENT = "pshcomment"
-
-  val WATCH_MONTH = "wmonth"
-  val WATCH_TIME = "wtime"
-  val WATCH_COMMITTER = "wlogin"
-
-  val FRK_MONTH ="frkmonth"
-  val FRK_TIME = "frkmonth"
-  val FRK_COMMITTER = "frklogin"
-
-  val ISC_MONTH ="iscmonth"
-  val ISC_TIME = "isctime"
-  val ISC_COMMITTER  = "isclogin"
-  val ISC_COMMENT = "isccomment"
-
-  val PRCR_MONTH = "prcrmonth"
-  val PRCR_TIME = "prcrtime"
-  val PRCR_COMMITTER = "prcrlogin"
-  val PRCR_COMMENT = "prcrcomment"
-
+  val REPOSTATS_NAME = "projectname"
+  val REPOSTATS_MONTH = "month"
+  val REPOSTATS_CREATEDAT = "createdat"
+  val REPOSTATS_LANGUAGE = "language"
+  val REPOSTATS_EVENT_TYPE = "eventtype"
+  val REPOSTATS_COMMENTS = "comments"
+  val REPOSTATS_EVENT_COMMITTER = "eventcommitter"
   ///// SCHEMA /////
  // val CREATED_DATE_TIME = DateTimeFormat.forPattern("MM/dd/yyyy")
 
