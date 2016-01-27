@@ -8,7 +8,7 @@ import org.apache.spark.sql.SQLContext
 /**
   * Created by sandeep on 1/20/16.
   */
-trait Queries {
+trait TopProjectQuery {
   self: DataManipulator =>
 
   def countEventsByRepo(eventType: String, df: DataFrame) = {

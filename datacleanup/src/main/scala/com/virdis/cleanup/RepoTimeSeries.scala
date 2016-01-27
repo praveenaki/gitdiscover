@@ -5,7 +5,7 @@ import Constants._
 /**
   * Created by sandeep on 1/25/16.
   */
-trait TimeSeries {
+trait RepoTimeSeries {
   self: DataManipulator =>
 
   def extractProjectDetails(df: DataFrame) = {
@@ -50,6 +50,7 @@ trait TimeSeries {
       pullReqsEventsDF(PULL_REQ_LANGUAGE_COLUMN)
     ).join(repoNameLangEventDF, NAME_COLUMN)
 
+    // flatten push event comments
     val pushEventRepoSchema = pushEventsDF.select(
       pushEventsDF(REPO_NAME_COLUMN).as(NAME_COLUMN),
       pushEventsDF(CREATED_AT_COLUMN).as(PSH_MONTH),

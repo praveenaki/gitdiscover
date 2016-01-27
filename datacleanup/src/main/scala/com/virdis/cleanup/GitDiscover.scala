@@ -16,14 +16,18 @@ object GitDiscover {
 
     val conf = new SparkConf(true)
                 .set("sandeep-cassandra-cluster:git/spark.cassandra.input.split.size_in_mb","64")
-                .set("spark.cassandra.connection.host","52.89.176.195")
+                .set("spark.cassandra.connection.host","172.31.2.69")
                 .setAppName("GitDiscover")
 
     val sc = new SparkContext(conf)
 
     val sqlContext = new SQLContext(sc)
 
-    object gitMetrics extends Queries with DataManipulator
+    val cfd = sqlContext.read.format("org.apache.spark.sql.cassandra")
+                .options(Map("table" -> "toprepos", "keyspace" -> "git",
+                  "cluster" -> "sandeep-cassandra-cluster", "spark.cassandra.input.split.size_in_mb" -> "64")).load()
+
+    object gitMetrics extends TopProjectQuery with DataManipulator
 
     val df = sqlContext.read.json("s3n://sandeep-git-archive/JanFull.json")
 
