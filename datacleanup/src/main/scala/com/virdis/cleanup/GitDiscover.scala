@@ -26,11 +26,10 @@ object GitDiscover {
 
     object gitMetrics extends TopProjectQuery with DataManipulator
 
-    //val df = sqlContext.read.json("s3n://sandeep-git-archive/JanFull.json")
+    val df = sqlContext.read.json("s3n://sandeep-git-archive/JanFull.json").unionAll(
+      sqlContext.read.json("s3n://sandeep-git-archive/FebFull.json")
+    )
 
-    // ubuer jar
-
-    val df = gitMetrics.uberDataFrame(sqlContext)
 
     val topPrjs = gitMetrics.topProjectsByLangRepo(df)(sqlContext)
 
