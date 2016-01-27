@@ -11,6 +11,7 @@ import com.datastax.spark.connector._
   */
 object GitDiscover {
 
+
   def main(args: Array[String]){
 
     val conf = new SparkConf(true)
@@ -26,23 +27,18 @@ object GitDiscover {
     val df = sqlContext.read.json("s3n://sandeep-git-archive/JanFull.json")
 
     val topPrjs = gitMetrics.topProjectsByLangRepo(df)(sqlContext)
-    
+
 
     try {
       topPrjs.write.format("org.apache.spark.sql.cassandra")
-        .options(Map("table" -> "repos", "keyspace" -> "gitproject")).mode(SaveMode.Append).save()
-
-      topPrjs.map {
-        row =>
-
-      }
+        .options(Map("table" -> "toprepos", "keyspace" -> "git")).mode(SaveMode.Append).save()
 
     } catch {
       case e: Exception =>
-        println("Exe: ====== "+e.printStackTrace())
-        println("Message :  ======= " +e.getMessage)
-        println("Details "+e.getCause)
-        e.fillInStackTrace()
+        println("==== Exception ===="+e.getCause)
+        println("=== Localized Message ==="+e.getLocalizedMessage)
+        println("=== Stack Trace ===="+e.printStackTrace())
+        println("=== Throw ====")
         throw e
     }
   }
