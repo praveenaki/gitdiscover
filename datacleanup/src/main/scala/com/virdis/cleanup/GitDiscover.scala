@@ -15,7 +15,8 @@ object GitDiscover {
   def main(args: Array[String]){
 
     val conf = new SparkConf(true)
-                .set("spark.cassandra.connection.host","52.35.99.109")
+                .set("sandeep-cassandra-cluster:git/spark.cassandra.input.split.size_in_mb","64")
+                .set("spark.cassandra.connection.host","52.89.176.195")
                 .setAppName("GitDiscover")
 
     val sc = new SparkContext(conf)
