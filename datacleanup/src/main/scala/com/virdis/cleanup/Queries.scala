@@ -50,19 +50,22 @@ trait Queries {
   def pullReqsByLangRepo(df: DataFrame)(implicit sqlContext: SQLContext): DataFrame = {
     val pullReqs = getDataByEventType(df, PULL_REQUEST_EVENT)
 
-    pullReqs.select(pullReqs(REPO_NAME_COLUMN),
+    pullReqs.filter(pullReqs(PULL_REQ_LANGUAGE_COLUMN).isNotNull).select(pullReqs(REPO_NAME_COLUMN),
       pullReqs(PULL_REQ_LANGUAGE_COLUMN))
       .groupBy("language","name").agg( count("language").as("pulltotals") )
 
   }
 
   def topProjectsByLangRepo(df: DataFrame)(implicit sqlContext: SQLContext): DataFrame = {
+
     val total = countOfSimilarStructureEventsByRepo(df).join(pullReqsByLangRepo(df), "name").map {
       row =>
-        Row(row.getAs[String](0), row.getAs[String](2), row.getAs[Long](1) + row.getAs[Long](3) )
+        Row(DATE_FORMAT.print(TODAY),
+          row.getAs[String](0), row.getAs[String](2), row.getAs[Long](1) + row.getAs[Long](3) )
     }
     sqlContext.createDataFrame(total, new StructType(
       Array(
+        StructField("date", StringType),
         StructField("name", StringType),
         StructField("language", StringType),
         StructField("eventstotal", LongType)
