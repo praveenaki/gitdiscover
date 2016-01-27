@@ -22,10 +22,7 @@ object GitDiscover {
     val sc = new SparkContext(conf)
 
     val sqlContext = new SQLContext(sc)
-
-    val cfd = sqlContext.read.format("org.apache.spark.sql.cassandra")
-                .options(Map("table" -> "toprepos", "keyspace" -> "git",
-                  "cluster" -> "sandeep-cassandra-cluster", "spark.cassandra.input.split.size_in_mb" -> "64")).load()
+    
 
     object gitMetrics extends TopProjectQuery with DataManipulator
 
@@ -33,7 +30,7 @@ object GitDiscover {
 
     val topPrjs = gitMetrics.topProjectsByLangRepo(df)(sqlContext)
 
-   // topPrjs.show()
+    topPrjs.show()
 
     try {
       topPrjs.write.format("org.apache.spark.sql.cassandra")
