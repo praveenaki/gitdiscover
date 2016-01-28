@@ -39,6 +39,16 @@ object Constants {
   val REPOSTATS_EVENT_TYPE = "eventtype"
   val REPOSTATS_COMMENTS = "comments"
   val REPOSTATS_EVENT_COMMITTER = "eventcommitter"
+
+  val PUSH_COUNT = "pushcount"
+  val PULL_COUNT = "pullcount"
+  val COMMIT_COUNT = "commitcount"
+  val WATCH_COUNT = "watchcount"
+  val ISSUE_COUNT = "issuecount"
+  val FORK_COUNT = "forkcount"
+  val ISSUE_COMMENT_EVENT_COUNT = "issuecmtcount"
+  val PULL_COMMENT_REVIEW_COUNT = "pullcmtrevcount"
+
   ///// SCHEMA /////
  // val CREATED_DATE_TIME = DateTimeFormat.forPattern("MM/dd/yyyy")
 
