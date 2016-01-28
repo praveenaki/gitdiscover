@@ -72,23 +72,55 @@ trait TopProjectQuery {
       )
     ))
   }
+  //[name, date, lang, event, date, lang, event]
+  def mergeDataFrames(df1: DataFrame, df2: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
+    val merged = df1.join(df2, NAME_COLUMN).map {
+      row =>
+        Row(
+          row.getAs[String](1),
+          row.getAs[String](0),
+          row.getAs[String](2),
+          row.getAs[Long](3) + row.getAs[Long](6)
+        )
+    }
+    sQLContext.createDataFrame(merged, new StructType(
+      Array(
+        StructField("date", StringType),
+        StructField("name", StringType),
+        StructField("language", StringType),
+        StructField("eventstotal", LongType)
+      )
+    ))
+  }
 
-  def mergeMonthDFs(implicit sqlContext: SQLContext) = {
-    val df1 = sqlContext.read.json("s3n://sandeep-git-archive/JanFull.json")
-    val df2 =  sqlContext.read.json("s3n://sandeep-git-archive/FebFull.json")
-    val df3 =  sqlContext.read.json("s3n://sandeep-git-archive/MarFull.json")
-    val df4 =  sqlContext.read.json("s3n://sandeep-git-archive/AprilFull.json")
+  def topProjects(implicit sqlContext: SQLContext) = {
+    val df1 = sqlContext.read.json(S3_FILENAMES(0))
+    val df2 =  sqlContext.read.json(S3_FILENAMES(1))
+    val df3 =  sqlContext.read.json(S3_FILENAMES(2))
+    val df4 =  sqlContext.read.json(S3_FILENAMES(3))
+    val df5 =  sqlContext.read.json(S3_FILENAMES(4))
+    val df6 =  sqlContext.read.json(S3_FILENAMES(5))
+    val df7 =  sqlContext.read.json(S3_FILENAMES(6))
+    val df8 =  sqlContext.read.json(S3_FILENAMES(7))
+    val df9 =  sqlContext.read.json(S3_FILENAMES(8))
+    val df10 =  sqlContext.read.json(S3_FILENAMES(9))
+    val df11 =  sqlContext.read.json(S3_FILENAMES(10))
+    val df12 =  sqlContext.read.json(S3_FILENAMES(11))
 
+    val res12 = mergeDataFrames(topProjectsByLangRepo(df1), topProjectsByLangRepo(df2))
+    val res34 = mergeDataFrames(topProjectsByLangRepo(df3), topProjectsByLangRepo(df4))
+    val res56 = mergeDataFrames(topProjectsByLangRepo(df5), topProjectsByLangRepo(df6))
+    val res78 = mergeDataFrames(topProjectsByLangRepo(df7), topProjectsByLangRepo(df8))
+    val res910 = mergeDataFrames(topProjectsByLangRepo(df9), topProjectsByLangRepo(df10))
+    val res1112 = mergeDataFrames(topProjectsByLangRepo(df11), topProjectsByLangRepo(df12))
 
+    // merge results
+    val mr1 = mergeDataFrames(res12, res34)
+    val mr2 = mergeDataFrames(res56, res78)
+    val mr3 = mergeDataFrames(res910, res1112)
 
-    val res1 = topProjectsByLangRepo(df1)
-    val res2 = topProjectsByLangRepo(df2)
-    val res12 = res1.unionAll(res2)
-    val res3 = topProjectsByLangRepo(df3)
-    val res4 = topProjectsByLangRepo(df4)
-    val res34 = res3.unionAll(res4)
-
-    res12.unionAll(res34)
+    val rz = mergeDataFrames(mr1, mr2)
+    mergeDataFrames(rz, mr3)
   }
 
 
