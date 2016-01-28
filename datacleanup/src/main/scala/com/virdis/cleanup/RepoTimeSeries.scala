@@ -1,6 +1,7 @@
 package com.virdis.cleanup
 
-import org.apache.spark.sql.{SaveMode, DataFrame}
+import org.apache.spark.sql.types.DateType
+import org.apache.spark.sql.{Row, SaveMode, DataFrame}
 import Constants._
 import org.joda.time.DateTime
 
@@ -19,11 +20,19 @@ trait RepoTimeSeries {
       pullReqsEventsDF(PULL_REQ_LANGUAGE_COLUMN)
     )
 
-    val tscols = df.select(
-      df(REPO_NAME_COLUMN).as(NAME_COLUMN)
-      //df(CREATED_AT_COLUMN).cast(new DateTime())
-    )
+    val tsColsDF = df.select(
+      df(REPO_NAME_COLUMN).as(NAME_COLUMN),
+      df(CREATED_AT_COLUMN).cast(DateType).as(REPOSTATS_CREATEDAT),
+      df(EVENT_TYPE).as(REPOSTATS_EVENT_TYPE),
+      df(USER_LOGIN_COLUMN).as(REPOSTATS_EVENT_COMMITTER)
+    ).join(repoNameLangEventDF, NAME_COLUMN)
 
+    tsColsDF.map {
+      row =>
+        Row(
+          row.getAs[String](0)
+        )
+    }
 
   }
 

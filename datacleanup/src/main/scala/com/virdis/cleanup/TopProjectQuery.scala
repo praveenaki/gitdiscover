@@ -73,16 +73,22 @@ trait TopProjectQuery {
     ))
   }
 
-  def mergeMonthDFs(sqlContext: SQLContext) = {
+  def mergeMonthDFs(implicit sqlContext: SQLContext) = {
     val df1 = sqlContext.read.json("s3n://sandeep-git-archive/JanFull.json")
-
     val df2 =  sqlContext.read.json("s3n://sandeep-git-archive/FebFull.json")
-
     val df3 =  sqlContext.read.json("s3n://sandeep-git-archive/MarFull.json")
+    val df4 =  sqlContext.read.json("s3n://sandeep-git-archive/AprilFull.json")
 
-    val res1 = topProjectsByLangRepo(df1)(sqlContext)
-    val res2 = topProjectsByLangRepo(df2)(sqlContext)
-    res1.unionAll(res2).unionAll(df3)
+
+
+    val res1 = topProjectsByLangRepo(df1)
+    val res2 = topProjectsByLangRepo(df2)
+    val res12 = res1.unionAll(res2)
+    val res3 = topProjectsByLangRepo(df3)
+    val res4 = topProjectsByLangRepo(df4)
+    val res34 = res3.unionAll(res4)
+
+    res12.unionAll(res34)
   }
 
 

@@ -30,6 +30,7 @@ object Constants {
   val PUSH_EVENT_COMMENT_COLUMN = "payload.commits"
   val ISSUE_COMMENT_EVENT_COLUMN = "payload.comment.body"
   val PULL_REQ_COMMENT_REVIEW_COMMENT_COLUMN = "payload.comment.body"
+  val EVENT_TYPE = "type"
 
   val REPOSTATS_NAME = "projectname"
   val REPOSTATS_MONTH = "month"
