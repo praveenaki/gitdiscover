@@ -27,12 +27,4 @@ trait DataManipulator {
     BUCKET_PATH + "DecFull.json"
   )
 
-  def uberDataFrame(sQLContext: SQLContext) = {
-    var df: DataFrame = sQLContext.read.json(listOfFileNames.head)
-    listOfFileNames.tail.foreach(s => df = df.unionAll(sQLContext.read.json(s)))
-
-    df
-  }
-
-
 }
