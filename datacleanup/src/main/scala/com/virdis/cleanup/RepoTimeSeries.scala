@@ -1,6 +1,6 @@
 package com.virdis.cleanup
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{SaveMode, DataFrame}
 import Constants._
 /**
   * Created by sandeep on 1/25/16.
@@ -8,7 +8,7 @@ import Constants._
 trait RepoTimeSeries {
   self: DataManipulator =>
 
-  def extractProjectDetails(df: DataFrame) = {
+  def extractAndSaveProjectDetails(df: DataFrame) = {
     val commitCommentEventsDF = getDataByEventType(df, COMMIT_COMMENT_EVENT)
     val issuesEventsDF = getDataByEventType(df, ISSUES_EVENT)
     val pullReqsEventsDF = getDataByEventType(df, PULL_REQUEST_EVENT)
@@ -30,6 +30,9 @@ trait RepoTimeSeries {
       commitCommentEventsDF(USER_LOGIN_COLUMN).as(REPOSTATS_EVENT_COMMITTER),
       commitCommentEventsDF(COMMIT_COMMENT_COLUMN).as(REPOSTATS_COMMENTS)
     ).join(repoNameLangEventDF, NAME_COLUMN)
+
+    cceRepoSchema.write.format("org.apache.spark.sql.cassandra")
+      .options(Map("table" -> "toprepos", "keyspace" -> "git")).mode(SaveMode.Append).save()
 
 
     val issuesRepoSchema = issuesEventsDF.filter(issuesEventsDF(ISSUES_COMMENT_COLUMN).isNotNull).select(
@@ -91,6 +94,8 @@ trait RepoTimeSeries {
       pullReqsCommentReviewEventsDF(USER_LOGIN_COLUMN).as(REPOSTATS_EVENT_COMMITTER),
       pullReqsCommentReviewEventsDF(PULL_REQ_COMMENT_REVIEW_COMMENT_COLUMN).as(REPOSTATS_COMMENTS)
     ).join(repoNameLangEventDF, NAME_COLUMN)
+
+
   }
 
 

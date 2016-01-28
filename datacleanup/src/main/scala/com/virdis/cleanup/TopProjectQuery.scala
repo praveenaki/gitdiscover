@@ -70,7 +70,19 @@ trait TopProjectQuery {
         StructField("language", StringType),
         StructField("eventstotal", LongType)
       )
-    )).sort(desc("eventstotal"))
+    ))
   }
+
+  def mergeMonthDFs(sqlContext: SQLContext) = {
+    val df1 = sqlContext.read.json("s3n://sandeep-git-archive/JanFull.json")
+
+    val df2 =  sqlContext.read.json("s3n://sandeep-git-archive/FebFull.json")
+
+    val res1 = topProjectsByLangRepo(df1)
+    val res2 = topProjectsByLangRepo(df2)
+    res1.unionAll(res2)
+  }
+
+
 
 }

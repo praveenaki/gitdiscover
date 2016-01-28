@@ -1,8 +1,8 @@
 package com.virdis.cleanup
 
-import com.virdis.cleanup.models._
 import org.apache.spark.sql.{SQLContext, DataFrame}
 import Constants._
+
 /**
   * Created by sandeep on 1/19/16.
   */
@@ -33,4 +33,6 @@ trait DataManipulator {
 
     df
   }
+
+
 }
