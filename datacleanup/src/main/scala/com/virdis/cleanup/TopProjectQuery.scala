@@ -78,9 +78,11 @@ trait TopProjectQuery {
 
     val df2 =  sqlContext.read.json("s3n://sandeep-git-archive/FebFull.json")
 
+    val df3 =  sqlContext.read.json("s3n://sandeep-git-archive/MarFull.json")
+
     val res1 = topProjectsByLangRepo(df1)(sqlContext)
     val res2 = topProjectsByLangRepo(df2)(sqlContext)
-    res1.unionAll(res2)
+    res1.unionAll(res2).unionAll(df3)
   }
 
 
