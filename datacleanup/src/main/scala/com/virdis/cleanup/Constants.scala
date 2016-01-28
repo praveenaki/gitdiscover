@@ -15,7 +15,7 @@ object Constants {
   val WATCH_EVENT = "WatchEvent"
   val FORK_EVENT = "ForkEvent"
   val ISSUE_COMMENT_EVENT = "IssueCommentEvent"
-  val PULL_REQUEST_COMMENT_REVIEW = "PullRequestReviewCommentEvent"
+  val PULL_REQUEST_COMMENT_REVIEW_EVENT = "PullRequestReviewCommentEvent"
 
   ///// COLUMN NAMES /////
   val REPO_NAME_COLUMN = "repo.name"
@@ -55,4 +55,21 @@ object Constants {
   val BUCKET_PATH = "s3n://sandeep-git-archive/"
   val DATE_FORMAT = DateTimeFormat.forPattern("MM/dd/yyyy")
   val TODAY = DateTime.now
+
+  val S3_FILENAMES = IndexedSeq(
+    BUCKET_PATH + "JanFull.json",
+    BUCKET_PATH + "FebFull.json",
+    BUCKET_PATH + "MarFull.json",
+    BUCKET_PATH + "AprilFull.json",
+    BUCKET_PATH + "MayFull.json",
+    BUCKET_PATH + "JunFull.json",
+    BUCKET_PATH + "JulFull.json",
+    BUCKET_PATH + "AugFull.json",
+    BUCKET_PATH + "SepFull.json",
+    BUCKET_PATH + "OctFull.json",
+    BUCKET_PATH + "NovFull.json",
+    BUCKET_PATH + "DecFull.json"
+  )
+
+
 }

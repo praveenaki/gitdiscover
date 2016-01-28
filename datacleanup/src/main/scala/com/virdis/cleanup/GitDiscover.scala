@@ -28,7 +28,7 @@ object GitDiscover {
 
 
 
-    val topPrjs = gitMetrics.mergeMonthDFs(sqlContext)
+    val topPrjs = gitMetrics.topProjects(sqlContext)
 
     //topPrjs.show()
 
