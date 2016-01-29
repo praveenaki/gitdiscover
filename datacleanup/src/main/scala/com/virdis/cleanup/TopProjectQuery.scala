@@ -2,7 +2,6 @@ package com.virdis.cleanup
 
 import org.apache.spark.sql.{SaveMode, Row, DataFrame, SQLContext}
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.Column
 import org.apache.spark.sql.types._
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat

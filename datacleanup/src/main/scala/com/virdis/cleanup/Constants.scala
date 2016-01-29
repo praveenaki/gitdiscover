@@ -57,7 +57,7 @@ object Constants {
     BUCKET_PATH + "MarFull.json",
     BUCKET_PATH + "AprilFull.json",
     BUCKET_PATH + "MayFull.json",
-    BUCKET_PATH + "JunFull.json",
+    BUCKET_PATH + "JuneFull.json",
     BUCKET_PATH + "JulFull.json",
     BUCKET_PATH + "AugFull.json",
     BUCKET_PATH + "SepFull.json",

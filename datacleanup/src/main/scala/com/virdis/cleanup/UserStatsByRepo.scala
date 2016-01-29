@@ -15,8 +15,7 @@ trait UserStatsByRepo {
   }
 
   def countByEvent(df: DataFrame, reponame: String, login: String, eventType: String): Long = {
-    df.filter(df(REPO_NAME_COLUMN) === reponame
-      && df(USER_LOGIN_COLUMN) === login && df(EVENT_TYPE) === eventType).count()
+    df.filter(df(REPO_NAME_COLUMN) === reponame && df(USER_LOGIN_COLUMN) === login && df(EVENT_TYPE) === eventType).count()
 
   }
 }
