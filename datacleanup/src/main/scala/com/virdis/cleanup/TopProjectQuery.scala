@@ -74,7 +74,7 @@ trait TopProjectQuery {
     ))
   }
   //[name, date, lang, event, date, lang, event]
-  def mergeDataFrames(df1: DataFrame, df2: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
+  /*def mergeDataFrames(df1: DataFrame, df2: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
     val merged = df1.join(df2, NAME_COLUMN).map {
       row =>
         println("MergeDataFrame "+row)
@@ -94,7 +94,7 @@ trait TopProjectQuery {
       )
     ))
   }
-
+*/
   def topProjects(implicit sqlContext: SQLContext) = {
     val df1 = sqlContext.read.json(S3_FILENAMES(0))
     val df2 =  sqlContext.read.json(S3_FILENAMES(1))
@@ -109,20 +109,39 @@ trait TopProjectQuery {
     val df11 =  sqlContext.read.json(S3_FILENAMES(10))
     val df12 =  sqlContext.read.json(S3_FILENAMES(11))
 
-    val res12 = mergeDataFrames(topProjectsByLangRepo(df1), topProjectsByLangRepo(df2))
-    val res34 = mergeDataFrames(topProjectsByLangRepo(df3), topProjectsByLangRepo(df4))
-    val res56 = mergeDataFrames(topProjectsByLangRepo(df5), topProjectsByLangRepo(df6))
-    val res78 = mergeDataFrames(topProjectsByLangRepo(df7), topProjectsByLangRepo(df8))
-    val res910 = mergeDataFrames(topProjectsByLangRepo(df9), topProjectsByLangRepo(df10))
-    val res1112 = mergeDataFrames(topProjectsByLangRepo(df11), topProjectsByLangRepo(df12))
+    val res1 = topProjectsByLangRepo(df1)
+    val res2 = topProjectsByLangRepo(df2)
+    val res12 = res1.unionAll(res2)
+    val res3 = topProjectsByLangRepo(df3)
+    val res4 = topProjectsByLangRepo(df4)
+    val res34 = res3.unionAll(res4)
 
-    // merge results
-    val mr1 = mergeDataFrames(res12, res34)
-    val mr2 = mergeDataFrames(res56, res78)
-    val mr3 = mergeDataFrames(res910, res1112)
+    val res1234 = res12.unionAll(res34)
 
-    val rz = mergeDataFrames(mr1, mr2)
-    mergeDataFrames(rz, mr3)
+    val res5 = topProjectsByLangRepo(df5)
+    val res6 = topProjectsByLangRepo(df6)
+    val res56 = res5.unionAll(res6)
+
+    val res7 = topProjectsByLangRepo(df7)
+    val res8 = topProjectsByLangRepo(df8)
+    val res78 = res7.unionAll(res8)
+
+    val res5678 = res56.unionAll(res78)
+
+    val res9 = topProjectsByLangRepo(df9)
+    val res10 = topProjectsByLangRepo(df10)
+    val res910 = res9.unionAll(res10)
+
+    val res11 = topProjectsByLangRepo(df11)
+    val res112 = topProjectsByLangRepo(df12)
+    val res1112 = res11.unionAll(res112)
+
+    val res912 = res910.unionAll(res1112)
+
+    val inter = res1234.unionAll(res5678)
+
+    inter.unionAll(res912)
+
   }
 
 
