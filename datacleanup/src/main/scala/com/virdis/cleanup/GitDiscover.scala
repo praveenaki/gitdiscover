@@ -26,18 +26,13 @@ object GitDiscover {
     val sqlContext = new SQLContext(sc)
     
 
-    object gitMetrics extends TopProjectQuery with DataManipulator
+    object gitMetrics extends TopProjectQuery with RepoTimeSeries with DataManipulator
 
-
-
-
-    //topPrjs.show()
 
     try {
-      val topPrjs = gitMetrics.topProjects(sqlContext)
+      gitMetrics.topProjects(sqlContext)
+      gitMetrics.repoTimeSeries(sqlContext)
 
-      topPrjs.write.format("org.apache.spark.sql.cassandra")
-        .options(Map("table" -> "toprepos", "keyspace" -> "git")).mode(SaveMode.Append).save()
 
     } catch {
       case e: Exception =>

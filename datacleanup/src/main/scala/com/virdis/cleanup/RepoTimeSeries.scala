@@ -36,7 +36,7 @@ trait RepoTimeSeries {
         Row(
           row.getAs[String](0),
           DateTime.parse(row.getAs[String](1)).toString("MMM"),
-          DateTime.parse(row.getAs[String](1)).toString(DATE_FORMAT),
+          DateTime.parse(row.getAs[String](1)).toString(),
           row.getAs[String](2),
           row.getAs[String](3),
           row.getAs[String](4)
@@ -54,6 +54,14 @@ trait RepoTimeSeries {
       )
     ))
 
+    res.write.format("org.apache.spark.sql.cassandra")
+      .options(Map("table" -> "repostats", "keyspace" -> "git")).mode(SaveMode.Append).save()
+
   }
+
+  def repoTimeSeries(implicit sQLContext: SQLContext) = {
+    allDFS(sQLContext).foreach(extractAndSaveRepoStats)
+  }
+
 
 }
