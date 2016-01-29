@@ -8,7 +8,5 @@ import Constants._
   */
 trait DataManipulator {
 
-  def getAllUserNames(df: DataFrame): DataFrame = df.select( df("actor")("login") )
-
-  def getDataByEventType(df: DataFrame, eventType: String): DataFrame = df.filter( df("type") === eventType )
+  def getDataByEventType(df: DataFrame, eventType: String): DataFrame = df.filter( df(EVENT_TYPE) === eventType )
 }

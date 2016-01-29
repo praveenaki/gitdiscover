@@ -10,7 +10,7 @@ import org.joda.time.DateTime
   */
 
 /*
-    This should be run for top 15 projects
+    This should be run for top projects
  */
 trait RepoTimeSeries {
   self: DataManipulator =>

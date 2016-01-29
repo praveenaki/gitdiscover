@@ -60,6 +60,7 @@ trait TopProjectQuery {
 
     val total = countOfSimilarStructureEventsByRepo(df).join(pullReqsByLangRepo(df), "name").map {
       row =>
+        println("TopProject By Lang Row "+row)
         Row(DATE_FORMAT.print(TODAY),
           row.getAs[String](0), row.getAs[String](2), row.getAs[Long](1) + row.getAs[Long](3) )
     }
@@ -76,6 +77,7 @@ trait TopProjectQuery {
   def mergeDataFrames(df1: DataFrame, df2: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
     val merged = df1.join(df2, NAME_COLUMN).map {
       row =>
+        println("MergeDataFrame "+row)
         Row(
           row.getAs[String](1),
           row.getAs[String](0),

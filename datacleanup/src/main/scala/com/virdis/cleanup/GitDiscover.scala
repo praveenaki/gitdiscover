@@ -28,11 +28,12 @@ object GitDiscover {
 
 
 
-    val topPrjs = gitMetrics.topProjects(sqlContext)
 
     //topPrjs.show()
 
     try {
+      val topPrjs = gitMetrics.topProjects(sqlContext)
+
       topPrjs.write.format("org.apache.spark.sql.cassandra")
         .options(Map("table" -> "toprepos", "keyspace" -> "git")).mode(SaveMode.Append).save()
 
