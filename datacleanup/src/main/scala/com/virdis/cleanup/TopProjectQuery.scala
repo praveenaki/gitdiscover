@@ -55,36 +55,36 @@ trait TopProjectQuery {
   }
 
   def topProjects(implicit sqlContext: SQLContext) = {
-    val res1 = topProjectsByLangRepo(allDFS(sqlContext)(0))
-    val res2 = topProjectsByLangRepo(allDFS(sqlContext)(1))
-    val res12 = res1.unionAll(res2)
-    val res3 = topProjectsByLangRepo(allDFS(sqlContext)(2))
-    val res4 = topProjectsByLangRepo(allDFS(sqlContext)(3))
-    val res34 = res3.unionAll(res4)
+    lazy val res1 = topProjectsByLangRepo(allDFS(sqlContext)(0))
+    lazy val res2 = topProjectsByLangRepo(allDFS(sqlContext)(1))
+    lazy val res12 = res1.unionAll(res2)
+    lazy val res3 = topProjectsByLangRepo(allDFS(sqlContext)(2))
+    lazy val res4 = topProjectsByLangRepo(allDFS(sqlContext)(3))
+    lazy val res34 = res3.unionAll(res4)
 
-    val res1234 = res12.unionAll(res34)
+    lazy val res1234 = res12.unionAll(res34)
 
-    val res5 = topProjectsByLangRepo(allDFS(sqlContext)(4))
-    val res6 = topProjectsByLangRepo(allDFS(sqlContext)(5))
-    val res56 = res5.unionAll(res6)
+    lazy val res5 = topProjectsByLangRepo(allDFS(sqlContext)(4))
+    lazy val res6 = topProjectsByLangRepo(allDFS(sqlContext)(5))
+    lazy val res56 = res5.unionAll(res6)
 
-    val res7 = topProjectsByLangRepo(allDFS(sqlContext)(6))
-    val res8 = topProjectsByLangRepo(allDFS(sqlContext)(7))
-    val res78 = res7.unionAll(res8)
+    lazy val res7 = topProjectsByLangRepo(allDFS(sqlContext)(6))
+    lazy val res8 = topProjectsByLangRepo(allDFS(sqlContext)(7))
+    lazy val res78 = res7.unionAll(res8)
 
-    val res5678 = res56.unionAll(res78)
+    lazy val res5678 = res56.unionAll(res78)
 
-    val res9 = topProjectsByLangRepo(allDFS(sqlContext)(8))
-    val res10 = topProjectsByLangRepo(allDFS(sqlContext)(9))
-    val res910 = res9.unionAll(res10)
+    lazy val res9 = topProjectsByLangRepo(allDFS(sqlContext)(8))
+    lazy val res10 = topProjectsByLangRepo(allDFS(sqlContext)(9))
+    lazy val res910 = res9.unionAll(res10)
 
-    val res11 = topProjectsByLangRepo(allDFS(sqlContext)(10))
-    val res112 = topProjectsByLangRepo(allDFS(sqlContext)(11))
-    val res1112 = res11.unionAll(res112)
+    lazy val res11 = topProjectsByLangRepo(allDFS(sqlContext)(10))
+    lazy val res112 = topProjectsByLangRepo(allDFS(sqlContext)(11))
+    lazy val res1112 = res11.unionAll(res112)
 
-    val res912 = res910.unionAll(res1112)
+    lazy val res912 = res910.unionAll(res1112)
 
-    val inter = res1234.unionAll(res5678)
+    lazy val inter = res1234.unionAll(res5678)
 
     inter.unionAll(res912).write.format("org.apache.spark.sql.cassandra")
       .options(Map("table" -> "toprepos", "keyspace" -> "git")).mode(SaveMode.Append).save()
