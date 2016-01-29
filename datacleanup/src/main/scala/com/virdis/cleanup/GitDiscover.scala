@@ -43,7 +43,6 @@ object GitDiscover {
         println("=== Localized Message ==="+e.getLocalizedMessage)
         println("=== Stack Trace ===="+e.printStackTrace())
         println("=== Throw ====")
-        throw e
     }
   }
 }
