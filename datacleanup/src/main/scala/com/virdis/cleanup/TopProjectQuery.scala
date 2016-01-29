@@ -54,32 +54,36 @@ trait TopProjectQuery {
     ))
   }
 
+  /*
+      lazy load files from S3
+   */
+
   def topProjects(implicit sqlContext: SQLContext) = {
-    lazy val res1 = topProjectsByLangRepo(allDFS(sqlContext)(0))
-    lazy val res2 = topProjectsByLangRepo(allDFS(sqlContext)(1))
+    lazy val res1 = topProjectsByLangRepo(s3FileHandle(0))
+    lazy val res2 = topProjectsByLangRepo(s3FileHandle(1))
     lazy val res12 = res1.unionAll(res2)
-    lazy val res3 = topProjectsByLangRepo(allDFS(sqlContext)(2))
-    lazy val res4 = topProjectsByLangRepo(allDFS(sqlContext)(3))
+    lazy val res3 = topProjectsByLangRepo(s3FileHandle(2))
+    lazy val res4 = topProjectsByLangRepo(s3FileHandle(3))
     lazy val res34 = res3.unionAll(res4)
 
     lazy val res1234 = res12.unionAll(res34)
 
-    lazy val res5 = topProjectsByLangRepo(allDFS(sqlContext)(4))
-    lazy val res6 = topProjectsByLangRepo(allDFS(sqlContext)(5))
+    lazy val res5 = topProjectsByLangRepo(s3FileHandle(4))
+    lazy val res6 = topProjectsByLangRepo(s3FileHandle(5))
     lazy val res56 = res5.unionAll(res6)
 
-    lazy val res7 = topProjectsByLangRepo(allDFS(sqlContext)(6))
-    lazy val res8 = topProjectsByLangRepo(allDFS(sqlContext)(7))
+    lazy val res7 = topProjectsByLangRepo(s3FileHandle(6))
+    lazy val res8 = topProjectsByLangRepo(s3FileHandle(7))
     lazy val res78 = res7.unionAll(res8)
 
     lazy val res5678 = res56.unionAll(res78)
 
-    lazy val res9 = topProjectsByLangRepo(allDFS(sqlContext)(8))
-    lazy val res10 = topProjectsByLangRepo(allDFS(sqlContext)(9))
+    lazy val res9 = topProjectsByLangRepo(s3FileHandle(8))
+    lazy val res10 = topProjectsByLangRepo(s3FileHandle(9))
     lazy val res910 = res9.unionAll(res10)
 
-    lazy val res11 = topProjectsByLangRepo(allDFS(sqlContext)(10))
-    lazy val res112 = topProjectsByLangRepo(allDFS(sqlContext)(11))
+    lazy val res11 = topProjectsByLangRepo(s3FileHandle(10))
+    lazy val res112 = topProjectsByLangRepo(s3FileHandle(11))
     lazy val res1112 = res11.unionAll(res112)
 
     lazy val res912 = res910.unionAll(res1112)
