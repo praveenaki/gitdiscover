@@ -1,8 +1,4 @@
 package com.virdis.cleanup
-
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
-
 /**
   * Created by sandeep on 1/19/16.
   */
@@ -31,6 +27,7 @@ object Constants {
   val ISSUE_COMMENT_EVENT_COLUMN = "payload.comment.body"
   val PULL_REQ_COMMENT_REVIEW_COMMENT_COLUMN = "payload.comment.body"
   val EVENT_TYPE = "type"
+  val LANGUAGE_COLUMN = "language"
 
   val REPOSTATS_NAME = "projectname"
   val REPOSTATS_MONTH = "month"
@@ -53,8 +50,6 @@ object Constants {
  // val CREATED_DATE_TIME = DateTimeFormat.forPattern("MM/dd/yyyy")
 
   val BUCKET_PATH = "s3n://sandeep-git-archive/"
-  val DATE_FORMAT = DateTimeFormat.forPattern("MM/dd/yyyy")
-  val TODAY = DateTime.now
 
   val S3_FILENAMES = IndexedSeq(
     BUCKET_PATH + "JanFull.json",

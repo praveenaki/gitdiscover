@@ -31,7 +31,7 @@ object GitDiscover {
 
     try {
       gitMetrics.topProjects(sqlContext)
-      gitMetrics.repoTimeSeries(sqlContext)
+     // gitMetrics.repoTimeSeries(sqlContext)
 
 
     } catch {
