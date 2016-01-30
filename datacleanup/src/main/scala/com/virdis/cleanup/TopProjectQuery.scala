@@ -70,7 +70,7 @@ trait TopProjectQuery {
     val res34 = unionResult(2,3)
 
     val res1234 = res12.unionAll(res34)
-    
+
     val res56 = unionResult(4,5)
 
     val res78 = unionResult(6,7)
