@@ -60,7 +60,7 @@ trait RepoTimeSeries {
   }
 
   def repoTimeSeries(implicit sQLContext: SQLContext) = {
-    allDFS(sQLContext).foreach(extractAndSaveRepoStats)
+    //allDFS(sQLContext).foreach(extractAndSaveRepoStats)
   }
 
 
