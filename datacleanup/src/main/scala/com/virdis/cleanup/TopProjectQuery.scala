@@ -86,7 +86,10 @@ trait TopProjectQuery {
     val inter = res1234.unionAll(res5678)
 
     val rez = inter.unionAll(res912)
-      rez.groupBy("name","eventstotal","date","language").agg(sum(rez("eventstotal").as("eventstotal"))).write.format("org.apache.spark.sql.cassandra")
+    val grpRes =  rez.groupBy(TOPREPOS_NAME_COLUMN,TOPREPOS_EVENTSTOTAL_COLUMN,
+      TOPREPOS_DATE_COLUMN_COLUMN,TOPREPOS_LANGUAGE_COLUMN).agg(sum(TOPREPOS_EVENTSTOTAL_COLUMN))
+
+    grpRes.withColumnRenamed(TOPREPOS_EVENTTOTAL_SUM_COLUMN, TOPREPOS_EVENTSTOTAL_COLUMN).write.format("org.apache.spark.sql.cassandra")
       .options(Map("table" -> "toprepos", "keyspace" -> "git")).mode(SaveMode.Append).save()
 
 

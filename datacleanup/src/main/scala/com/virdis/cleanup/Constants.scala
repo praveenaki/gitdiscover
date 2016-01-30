@@ -46,6 +46,13 @@ object Constants {
   val ISSUE_COMMENT_EVENT_COUNT = "issuecmtcount"
   val PULL_COMMENT_REVIEW_COUNT = "pullcmtrevcount"
 
+  val TOPREPOS_NAME_COLUMN = "name"
+  val TOPREPOS_EVENTSTOTAL_COLUMN = "eventstotal"
+  val TOPREPOS_DATE_COLUMN_COLUMN = "date"
+  val TOPREPOS_LANGUAGE_COLUMN = "language"
+  val TOPREPOS_EVENTTOTAL_SUM_COLUMN = "sum(eventstotal)"
+
+
   ///// SCHEMA /////
  // val CREATED_DATE_TIME = DateTimeFormat.forPattern("MM/dd/yyyy")
 
@@ -71,5 +78,6 @@ object Constants {
     PUSH_EVENT, PULL_REQUEST_EVENT, WATCH_EVENT, FORK_EVENT,
     ISSUE_COMMENT_EVENT, PULL_REQUEST_COMMENT_REVIEW_EVENT
   )
+
 
 }

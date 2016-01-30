@@ -60,7 +60,9 @@ trait RepoTimeSeries {
   }
 
   def repoTimeSeries(implicit sQLContext: SQLContext) = {
-    //allDFS(sQLContext).foreach(extractAndSaveRepoStats)
+    S3_FILENAMES.zipWithIndex.foreach {
+      case(_, idx) => extractAndSaveRepoStats(s3FileHandle(idx))
+    }
   }
 
 
