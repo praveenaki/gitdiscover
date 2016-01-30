@@ -58,37 +58,32 @@ trait TopProjectQuery {
       lazy load files from S3
    */
 
+  def unionResult(idx1: Int, idx2: Int): DataFrame = {
+    val res1 = topProjectsByLangRepo(s3FileHandle(idx1))
+    val res2 = topProjectsByLangRepo(s3FileHandle(idx2))
+    res1.unionAll(res2)
+  }
+
   def topProjects(implicit sqlContext: SQLContext) = {
-    lazy val res1 = topProjectsByLangRepo(s3FileHandle(0))
-    lazy val res2 = topProjectsByLangRepo(s3FileHandle(1))
-    lazy val res12 = res1.unionAll(res2)
-    lazy val res3 = topProjectsByLangRepo(s3FileHandle(2))
-    lazy val res4 = topProjectsByLangRepo(s3FileHandle(3))
-    lazy val res34 = res3.unionAll(res4)
+    val res12 = unionResult(0, 1)
 
-    lazy val res1234 = res12.unionAll(res34)
+    val res34 = unionResult(2,3)
 
-    lazy val res5 = topProjectsByLangRepo(s3FileHandle(4))
-    lazy val res6 = topProjectsByLangRepo(s3FileHandle(5))
-    lazy val res56 = res5.unionAll(res6)
+    val res1234 = res12.unionAll(res34)
+    
+    val res56 = unionResult(4,5)
 
-    lazy val res7 = topProjectsByLangRepo(s3FileHandle(6))
-    lazy val res8 = topProjectsByLangRepo(s3FileHandle(7))
-    lazy val res78 = res7.unionAll(res8)
+    val res78 = unionResult(6,7)
 
-    lazy val res5678 = res56.unionAll(res78)
+    val res5678 = res56.unionAll(res78)
 
-    lazy val res9 = topProjectsByLangRepo(s3FileHandle(8))
-    lazy val res10 = topProjectsByLangRepo(s3FileHandle(9))
-    lazy val res910 = res9.unionAll(res10)
+    val res910 = unionResult(8,9)
 
-    lazy val res11 = topProjectsByLangRepo(s3FileHandle(10))
-    lazy val res112 = topProjectsByLangRepo(s3FileHandle(11))
-    lazy val res1112 = res11.unionAll(res112)
+    val res1112 = unionResult(10,11)
 
-    lazy val res912 = res910.unionAll(res1112)
+    val res912 = res910.unionAll(res1112)
 
-    lazy val inter = res1234.unionAll(res5678)
+    val inter = res1234.unionAll(res5678)
 
     inter.unionAll(res912).write.format("org.apache.spark.sql.cassandra")
       .options(Map("table" -> "toprepos", "keyspace" -> "git")).mode(SaveMode.Append).save()
