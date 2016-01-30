@@ -58,7 +58,7 @@ trait TopProjectQuery {
       lazy load files from S3
    */
 
-  def unionResult(idx1: Int, idx2: Int): DataFrame = {
+  def unionResult(idx1: Int, idx2: Int)(implicit sQLContext: SQLContext): DataFrame = {
     val res1 = topProjectsByLangRepo(s3FileHandle(idx1))
     val res2 = topProjectsByLangRepo(s3FileHandle(idx2))
     res1.unionAll(res2)
