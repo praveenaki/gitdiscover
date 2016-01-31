@@ -17,4 +17,11 @@ trait DataManipulator {
   def s3FileHandle(idx: Int)(implicit sqlContext: SQLContext) = {
     sqlContext.read.json(S3_FILENAMES(idx))
   }
+
+  def repoAndLanguageDF(df: DataFrame)(implicit sqlContext: SQLContext): DataFrame = {
+    val pullReqs = getDataByEventType(df, PULL_REQUEST_EVENT)
+
+    pullReqs.filter(pullReqs(PULL_REQ_LANGUAGE_COLUMN).isNotNull).select(pullReqs(REPO_NAME_COLUMN),
+      pullReqs(PULL_REQ_LANGUAGE_COLUMN))
+  }
 }
