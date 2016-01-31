@@ -36,7 +36,7 @@ object GitDiscover {
       }
       if (!config.getBoolean("job.name.repotimeseries.status")) {
         println("=========== REPOTIMESERIES JOB ============")
-        //gitMetrics.repoTimeSeries(sqlContext)
+        gitMetrics.repoTimeSeries(sqlContext)
       }
 
       if (!config.getBoolean("job.name.userstats")) {

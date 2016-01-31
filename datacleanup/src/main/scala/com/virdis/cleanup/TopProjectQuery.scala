@@ -81,11 +81,15 @@ trait TopProjectQuery {
     val inter = res1234.unionAll(res5678)
 
     val rez = inter.unionAll(res912)
-    val grpRes =  rez.groupBy(TOPREPOS_NAME_COLUMN,TOPREPOS_EVENTSTOTAL_COLUMN,
-      TOPREPOS_DATE_COLUMN,TOPREPOS_LANGUAGE_COLUMN).agg(sum(TOPREPOS_EVENTSTOTAL_COLUMN).as("ir"))
 
-    grpRes.select( grpRes(TOPREPOS_DATE_COLUMN), grpRes(TOPREPOS_NAME_COLUMN),
-      grpRes("ir").as(TOPREPOS_EVENTSTOTAL_COLUMN), grpRes(TOPREPOS_LANGUAGE_COLUMN) ).write.format("org.apache.spark.sql.cassandra")
+    val grpRes =  rez.groupBy(TOPREPOS_NAME_COLUMN,TOPREPOS_EVENTSTOTAL_COLUMN,
+      TOPREPOS_DATE_COLUMN,TOPREPOS_LANGUAGE_COLUMN).agg(sum(TOPREPOS_EVENTSTOTAL_COLUMN).as("esum"))
+
+    val uniGrpRes = grpRes.groupBy(TOPREPOS_NAME_COLUMN,TOPREPOS_EVENTSTOTAL_COLUMN,
+      TOPREPOS_DATE_COLUMN,TOPREPOS_LANGUAGE_COLUMN,"esum").agg(max(grpRes("esum")).as("ir"))
+
+    uniGrpRes.select( uniGrpRes(TOPREPOS_DATE_COLUMN), uniGrpRes(TOPREPOS_NAME_COLUMN),
+      uniGrpRes("ir").as(TOPREPOS_EVENTSTOTAL_COLUMN), uniGrpRes(TOPREPOS_LANGUAGE_COLUMN) ).write.format("org.apache.spark.sql.cassandra")
       .options(Map("table" -> "toprepos", "keyspace" -> "git")).mode(SaveMode.Append).save()
 
   }

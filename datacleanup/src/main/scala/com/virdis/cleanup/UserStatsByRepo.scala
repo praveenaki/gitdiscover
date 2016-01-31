@@ -13,6 +13,7 @@ trait UserStatsByRepo {
   self: CommonDataFunctions =>
 
   def userStatsByRepoName(df: DataFrame, reponame: String, login: String)(implicit sQLContext: SQLContext) = {
+
     val jrez = joinDataWithTopRepos(df)
     val reponamelogin = jrez.select( jrez(NAME_COLUMN),jrez(USER_LOGIN_COLUMN) )
     var usernLogin  = List.empty[(String,String)]
@@ -41,5 +42,6 @@ trait UserStatsByRepo {
     )
     selectedColsDF.join(top200NameAndLang, NAME_COLUMN)
   }
+
 
 }
