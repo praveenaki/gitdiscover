@@ -50,65 +50,6 @@ trait TopProjectQuery {
     tp.sort( tp("eventstotal").desc ).limit(LIMIT)
   }
 
-  def mergeDFResults(df1: DataFrame, df2: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
-    val merged = df1.join(df2, "name")
-
-    val rez = merged.map {
-      row =>
-        Row(
-          row.getAs[String](1),
-          row.getAs[String](0),
-          row.getAs[String](2),
-          row.getAs[Long](3) + row.getAs[Long](6)
-        )
-    }
-
-    val finalrez = sQLContext.createDataFrame(rez, new StructType(
-      Array(
-        StructField("date", StringType),
-        StructField("name", StringType),
-        StructField("language", StringType),
-        StructField("eventstotal", LongType)
-      )
-    ))
-
-    finalrez.sort( finalrez("eventstotal").desc ).limit(LIMIT)
-  }
-
-  def mergeTopProjectsRes(idx1: Int, idx2: Int)(implicit sQLContext: SQLContext): DataFrame = {
-    val res1 = topProjectsByLangRepo(s3FileHandle(idx1))
-    val res2 = topProjectsByLangRepo(s3FileHandle(idx2))
-    mergeDFResults(res1, res2)
-  }
-
-  def popularprojects(implicit sQLContext: SQLContext) = {
-    val res12 = mergeTopProjectsRes(0, 1)
-
-    val res34 = mergeTopProjectsRes(2,3)
-
-    val res1234 = mergeDFResults(res12, res34)
-
-    val res56 = mergeTopProjectsRes(4,5)
-
-    val res78 = mergeTopProjectsRes(6,7)
-
-    val res5678 = mergeDFResults(res56, res78)
-
-    val res910 = mergeTopProjectsRes(8,9)
-
-    val res1112 = mergeTopProjectsRes(10,11)
-
-    val res912 = mergeDFResults(res910, res1112)
-
-    val inter = mergeDFResults(res1234,res5678)
-
-    val rez =  mergeDFResults(inter, res912)
-
-    rez.write.format("org.apache.spark.sql.cassandra").options(
-      Map("table" -> "popularrepos", "keyspace" -> "git")
-    ).mode(SaveMode.Append).save()
-  }
-
   /*
       lazy load files from S3
    */
@@ -116,7 +57,7 @@ trait TopProjectQuery {
   def unionResult(idx1: Int, idx2: Int)(implicit sQLContext: SQLContext): DataFrame = {
     val res1 = topProjectsByLangRepo(s3FileHandle(idx1))
     val res2 = topProjectsByLangRepo(s3FileHandle(idx2))
-    res1.unionAll(res2)
+    res1.unionAll(res2).dropDuplicates(Array("name"))
   }
 
   def topProjects(implicit sqlContext: SQLContext) = {
@@ -124,23 +65,23 @@ trait TopProjectQuery {
 
     val res34 = unionResult(2,3)
 
-    val res1234 = res12.unionAll(res34)
+    val res1234 = res12.unionAll(res34).dropDuplicates(Array("name"))
 
     val res56 = unionResult(4,5)
 
     val res78 = unionResult(6,7)
 
-    val res5678 = res56.unionAll(res78)
+    val res5678 = res56.unionAll(res78).dropDuplicates(Array("name"))
 
     val res910 = unionResult(8,9)
 
     val res1112 = unionResult(10,11)
 
-    val res912 = res910.unionAll(res1112)
+    val res912 = res910.unionAll(res1112).dropDuplicates(Array("name"))
 
-    val inter = res1234.unionAll(res5678)
+    val inter = res1234.unionAll(res5678).dropDuplicates(Array("name"))
 
-    val rez = inter.unionAll(res912)
+    val rez = inter.unionAll(res912).dropDuplicates(Array("name"))
     val grpRes =  rez.groupBy(TOPREPOS_NAME_COLUMN,TOPREPOS_EVENTSTOTAL_COLUMN,
       TOPREPOS_DATE_COLUMN,TOPREPOS_LANGUAGE_COLUMN).agg(sum(TOPREPOS_EVENTSTOTAL_COLUMN).as("ir"))
 

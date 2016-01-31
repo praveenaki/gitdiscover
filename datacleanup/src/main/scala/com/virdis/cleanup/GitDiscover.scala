@@ -17,8 +17,6 @@ object GitDiscover {
                 .set("spark.driver.memory", "14g")
                 .set("sandeep-cassandra-cluster:git/spark.cassandra.input.split.size_in_mb","128")
                 .set("spark.cassandra.connection.host","172.31.2.69")
-                .set("spark.eventLog.enabled", "true")
-                .set("spark.eventLog.dir","file:/tmp/spark-events")
                 .setAppName("GitDiscover")
 
     val sc = new SparkContext(conf)

@@ -6,16 +6,26 @@ import org.apache.spark.sql.{SQLContext, GroupedData, DataFrame}
   * Created by sandeep on 1/27/16.
   */
 
-case class UserStats(eventType: String, counter: Long)
+case class UserStats(projectName:String, username: String, activity: Long)
 
 trait UserStatsByRepo {
 
   self: CommonDataFunctions =>
 
-  def userStatsByRepoName(df: DataFrame, reponame: String, login: String)(implicit sQLContext: SQLContext): Long = {
+  def userStatsByRepoName(df: DataFrame, reponame: String, login: String)(implicit sQLContext: SQLContext) = {
     val jrez = joinDataWithTopRepos(df)
-    val userActivity = ALL_EVENTS.foldLeft(0L)((b,a) => countByEvent(jrez, reponame, login, a))
-    userActivity
+    val reponamelogin = jrez.select( jrez(NAME_COLUMN),jrez(USER_LOGIN_COLUMN) )
+    var usernLogin  = List.empty[(String,String)]
+
+    reponamelogin.foreach(r => (r.getAs[String](0), r.getAs[String](1)) +: usernLogin)
+
+    val result = usernLogin.foldLeft(List.empty[UserStats]) { (acc, rnunTup) =>
+      val totalUserActivity = ALL_EVENTS.foldLeft(0L)((b,a) => countByEvent(jrez, rnunTup._1, rnunTup._2, a))
+      UserStats(rnunTup._1, rnunTup._2, totalUserActivity) +: acc
+
+    }
+    / save result to
+
   }
 
   def countByEvent(df: DataFrame, reponame: String, login: String, eventType: String): Long = {
