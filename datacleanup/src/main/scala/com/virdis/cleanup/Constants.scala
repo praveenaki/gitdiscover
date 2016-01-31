@@ -48,7 +48,7 @@ object Constants {
 
   val TOPREPOS_NAME_COLUMN = "name"
   val TOPREPOS_EVENTSTOTAL_COLUMN = "eventstotal"
-  val TOPREPOS_DATE_COLUMN_COLUMN = "date"
+  val TOPREPOS_DATE_COLUMN = "date"
   val TOPREPOS_LANGUAGE_COLUMN = "language"
   val TOPREPOS_EVENTTOTAL_SUM_COLUMN = "sum(eventstotal)"
 

@@ -61,11 +61,7 @@ trait TopProjectQuery {
   def unionResult(idx1: Int, idx2: Int)(implicit sQLContext: SQLContext): DataFrame = {
     val res1 = topProjectsByLangRepo(s3FileHandle(idx1))
     val res2 = topProjectsByLangRepo(s3FileHandle(idx2))
-    val rez = res1.unionAll(res2)
-      rez.groupBy(TOPREPOS_NAME_COLUMN, TOPREPOS_EVENTSTOTAL_COLUMN,
-      TOPREPOS_DATE_COLUMN_COLUMN,TOPREPOS_LANGUAGE_COLUMN)
-        .agg( sum(rez(TOPREPOS_EVENTSTOTAL_COLUMN)) )
-        .withColumnRenamed(TOPREPOS_EVENTTOTAL_SUM_COLUMN, TOPREPOS_EVENTSTOTAL_COLUMN)
+    res1.unionAll(res2)
   }
 
   def topProjects(implicit sqlContext: SQLContext) = {
@@ -89,9 +85,13 @@ trait TopProjectQuery {
 
     val inter = res1234.unionAll(res5678)
 
-    inter.unionAll(res912).write.format("org.apache.spark.sql.cassandra")
-      .options(Map("table" -> "toprepos", "keyspace" -> "git")).mode(SaveMode.Append).save()
+    val rez = inter.unionAll(res912)
+    val grpRes =  rez.groupBy(TOPREPOS_NAME_COLUMN,TOPREPOS_EVENTSTOTAL_COLUMN,
+      TOPREPOS_DATE_COLUMN,TOPREPOS_LANGUAGE_COLUMN).agg(sum(TOPREPOS_EVENTSTOTAL_COLUMN).as("ir"))
 
+    grpRes.select( grpRes(TOPREPOS_DATE_COLUMN), grpRes(TOPREPOS_NAME_COLUMN),
+      grpRes("ir").as(TOPREPOS_EVENTSTOTAL_COLUMN), grpRes(TOPREPOS_LANGUAGE_COLUMN) ).write.format("org.apache.spark.sql.cassandra")
+      .options(Map("table" -> "toprepos", "keyspace" -> "git")).mode(SaveMode.Append).save()
 
   }
 
