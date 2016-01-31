@@ -52,6 +52,7 @@ object Constants {
   val TOPREPOS_LANGUAGE_COLUMN = "language"
   val TOPREPOS_EVENTTOTAL_SUM_COLUMN = "sum(eventstotal)"
 
+  val LIMIT = 200
 
   ///// SCHEMA /////
  // val CREATED_DATE_TIME = DateTimeFormat.forPattern("MM/dd/yyyy")

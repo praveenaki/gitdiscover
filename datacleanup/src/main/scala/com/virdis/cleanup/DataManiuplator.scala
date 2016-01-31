@@ -6,7 +6,7 @@ import Constants._
 /**
   * Created by sandeep on 1/19/16.
   */
-trait DataManipulator {
+trait CommonDataFunctions {
 
   def getDataByEventType(df: DataFrame, eventType: String): DataFrame = df.filter( df(EVENT_TYPE) === eventType )
 
@@ -24,4 +24,16 @@ trait DataManipulator {
     pullReqs.filter(pullReqs(PULL_REQ_LANGUAGE_COLUMN).isNotNull).select(pullReqs(REPO_NAME_COLUMN),
       pullReqs(PULL_REQ_LANGUAGE_COLUMN))
   }
+
+  def getData(sQLContext: SQLContext) = {
+    val df = sQLContext
+      .read
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map( "table" -> "popularrepos", "keyspace" -> "git" ))
+      .load().limit(LIMIT)
+
+    df.select( df(NAME_COLUMN), df(LANGUAGE_COLUMN) )
+
+  }
+
 }

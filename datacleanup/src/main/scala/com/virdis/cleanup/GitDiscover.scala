@@ -17,6 +17,8 @@ object GitDiscover {
                 .set("spark.driver.memory", "14g")
                 .set("sandeep-cassandra-cluster:git/spark.cassandra.input.split.size_in_mb","128")
                 .set("spark.cassandra.connection.host","172.31.2.69")
+                .set("spark.eventLog.enabled", "true")
+                .set("spark.eventLog.dir","file:/tmp/spark-events")
                 .setAppName("GitDiscover")
 
     val sc = new SparkContext(conf)
@@ -26,7 +28,7 @@ object GitDiscover {
     val config = ConfigFactory.load()
 
 
-    object gitMetrics extends TopProjectQuery with RepoTimeSeries with DataManipulator
+    object gitMetrics extends TopProjectQuery with RepoTimeSeries with CommonDataFunctions
 
 
     try {
@@ -37,12 +39,6 @@ object GitDiscover {
       if (!config.getBoolean("job.name.repotimeseries.status")) {
         println("=========== REPOTIMESERIES JOB ============")
         //gitMetrics.repoTimeSeries(sqlContext)
-      }
-
-      if (!config.getBoolean("job.name.popularrepos.status")) {
-        println("=========== POPULAR JOB ============")
-
-        gitMetrics.popularprojects(sqlContext)
       }
 
       if (!config.getBoolean("job.name.userstats")) {

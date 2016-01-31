@@ -10,10 +10,12 @@ case class UserStats(eventType: String, counter: Long)
 
 trait UserStatsByRepo {
 
-  self: DataManipulator =>
+  self: CommonDataFunctions =>
 
-  def userStatsByRepoName(df: DataFrame, reponame: String, login: String): Long = {
-    ALL_EVENTS.foldLeft(0L)((b,a) => countByEvent(df, reponame, login, a))
+  def userStatsByRepoName(df: DataFrame, reponame: String, login: String)(implicit sQLContext: SQLContext): Long = {
+    val jrez = joinDataWithTopRepos(df)
+    val userActivity = ALL_EVENTS.foldLeft(0L)((b,a) => countByEvent(jrez, reponame, login, a))
+
   }
 
   def countByEvent(df: DataFrame, reponame: String, login: String, eventType: String): Long = {
@@ -21,22 +23,13 @@ trait UserStatsByRepo {
 
   }
 
-  def process(df: DataFrame)(implicit sQLContext: SQLContext) = {
-    val rnameAndLang = repoAndLanguageDF(df)
+  def joinDataWithTopRepos(df: DataFrame)(implicit sQLContext: SQLContext) = {
+    val top200NameAndLang = getData(sQLContext)
+
     val selectedColsDF = df.select(
-      df(REPO_NAME_COLUMN), df(USER_LOGIN_COLUMN), df(EVENT_TYPE)
+      df(REPO_NAME_COLUMN).as(NAME_COLUMN), df(USER_LOGIN_COLUMN), df(EVENT_TYPE)
     )
-    rnameAndLang.join(selectedColsDF, NAME_COLUMN)
-  }
-
-
-  def getData(sQLContext: SQLContext) = {
-    val df = sQLContext
-      .read
-      .format("org.apache.spark.sql.cassandra")
-      .options(Map( "table" -> "popularrepos", "keyspace" -> "git" ))
-      .load().limit(200)
-
+    selectedColsDF.join(top200NameAndLang, NAME_COLUMN)
   }
 
 }

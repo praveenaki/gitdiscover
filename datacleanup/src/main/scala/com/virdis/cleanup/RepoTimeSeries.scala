@@ -13,23 +13,18 @@ import org.joda.time.DateTime
     This should be run for top projects
  */
 trait RepoTimeSeries {
-  self: DataManipulator =>
+  self: CommonDataFunctions =>
 
   def extractAndSaveRepoStats(df: DataFrame)(implicit sQLContext: SQLContext) = {
 
-    val pullReqsEventsDF = getDataByEventType(df, PULL_REQUEST_EVENT)
-
-    val repoNameLangEventDF = pullReqsEventsDF.filter(pullReqsEventsDF(PULL_REQ_LANGUAGE_COLUMN).isNotNull).select(
-      pullReqsEventsDF(REPO_NAME_COLUMN).as(NAME_COLUMN),
-      pullReqsEventsDF(PULL_REQ_LANGUAGE_COLUMN).as(REPOSTATS_LANGUAGE)
-    )
+    val top200NameAndLang = getData(sQLContext)
 
     val tsColsDF = df.select(
       df(REPO_NAME_COLUMN).as(NAME_COLUMN),
       df(CREATED_AT_COLUMN).as(REPOSTATS_CREATEDAT),
       df(EVENT_TYPE).as(REPOSTATS_EVENT_TYPE),
       df(USER_LOGIN_COLUMN).as(REPOSTATS_EVENT_COMMITTER)
-    ).join(repoNameLangEventDF, NAME_COLUMN)
+    ).join(top200NameAndLang, NAME_COLUMN)
 
     val ir = tsColsDF.map {
       row =>

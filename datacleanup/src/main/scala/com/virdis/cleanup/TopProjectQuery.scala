@@ -10,7 +10,7 @@ import Constants._
   * Created by sandeep on 1/20/16.
   */
 trait TopProjectQuery {
-  self: DataManipulator =>
+  self: CommonDataFunctions =>
 
   def countEventsByRepo(eventType: String, df: DataFrame) = {
     getDataByEventType(df, eventType).groupBy(REPO_NAME_COLUMN).agg(count(REPO_NAME_COLUMN).alias(TOTAL_COLUMN))
@@ -38,7 +38,7 @@ trait TopProjectQuery {
         )
     }
 
-    sqlContext.createDataFrame(stats, new StructType(
+    val tp = sqlContext.createDataFrame(stats, new StructType(
       Array(
         StructField("date", StringType),
         StructField("name", StringType),
@@ -46,6 +46,8 @@ trait TopProjectQuery {
         StructField("eventstotal", LongType)
       )
     ))
+
+    tp.sort( tp("eventstotal").desc ).limit(LIMIT)
   }
 
   def mergeDFResults(df1: DataFrame, df2: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
@@ -70,7 +72,7 @@ trait TopProjectQuery {
       )
     ))
 
-    finalrez.sort( finalrez("eventstotal").desc ).limit(200)
+    finalrez.sort( finalrez("eventstotal").desc ).limit(LIMIT)
   }
 
   def mergeTopProjectsRes(idx1: Int, idx2: Int)(implicit sQLContext: SQLContext): DataFrame = {
