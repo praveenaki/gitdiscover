@@ -15,7 +15,7 @@ trait UserStatsByRepo {
   def userStatsByRepoName(df: DataFrame, reponame: String, login: String)(implicit sQLContext: SQLContext): Long = {
     val jrez = joinDataWithTopRepos(df)
     val userActivity = ALL_EVENTS.foldLeft(0L)((b,a) => countByEvent(jrez, reponame, login, a))
-
+    userActivity
   }
 
   def countByEvent(df: DataFrame, reponame: String, login: String, eventType: String): Long = {
