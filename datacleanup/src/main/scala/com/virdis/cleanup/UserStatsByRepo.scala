@@ -26,7 +26,17 @@ trait UserStatsByRepo {
     val selectedColsDF = df.select(
       df(REPO_NAME_COLUMN), df(USER_LOGIN_COLUMN), df(EVENT_TYPE)
     )
-    rnameAndLang.join(df, NAME_COLUMN)
+    rnameAndLang.join(selectedColsDF, NAME_COLUMN)
+  }
+
+
+  def getData(sQLContext: SQLContext) = {
+    val df = sQLContext
+      .read
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map( "table" -> "popularrepos", "keyspace" -> "git" ))
+      .load().limit(200)
+
   }
 
 }

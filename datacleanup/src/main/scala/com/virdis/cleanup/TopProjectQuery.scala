@@ -61,7 +61,7 @@ trait TopProjectQuery {
         )
     }
 
-    sQLContext.createDataFrame(rez, new StructType(
+    val finalrez = sQLContext.createDataFrame(rez, new StructType(
       Array(
         StructField("date", StringType),
         StructField("name", StringType),
@@ -69,6 +69,8 @@ trait TopProjectQuery {
         StructField("eventstotal", LongType)
       )
     ))
+
+    finalrez.sort( finalrez("eventstotal").desc ).limit(200)
   }
 
   def mergeTopProjectsRes(idx1: Int, idx2: Int)(implicit sQLContext: SQLContext): DataFrame = {
