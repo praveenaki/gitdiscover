@@ -17,14 +17,14 @@ trait UserStatsByRepo {
     val reponamelogin = jrez.select( jrez(NAME_COLUMN),jrez(USER_LOGIN_COLUMN) )
     var usernLogin  = List.empty[(String,String)]
 
-    reponamelogin.foreach(r => (r.getAs[String](0), r.getAs[String](1)) +: usernLogin)
+    reponamelogin.foreach(r => usernLogin = (r.getAs[String](0), r.getAs[String](1)) +: usernLogin)
 
     val result = usernLogin.foldLeft(List.empty[UserStats]) { (acc, rnunTup) =>
       val totalUserActivity = ALL_EVENTS.foldLeft(0L)((b,a) => countByEvent(jrez, rnunTup._1, rnunTup._2, a))
       UserStats(rnunTup._1, rnunTup._2, totalUserActivity) +: acc
 
     }
-    / save result to
+    // save result to
 
   }
 

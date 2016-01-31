@@ -38,7 +38,7 @@ trait TopProjectQuery {
         )
     }
 
-    val tp = sqlContext.createDataFrame(stats, new StructType(
+    sqlContext.createDataFrame(stats, new StructType(
       Array(
         StructField("date", StringType),
         StructField("name", StringType),
@@ -47,7 +47,6 @@ trait TopProjectQuery {
       )
     ))
 
-    tp.sort( tp("eventstotal").desc ).limit(LIMIT)
   }
 
   /*
@@ -57,7 +56,7 @@ trait TopProjectQuery {
   def unionResult(idx1: Int, idx2: Int)(implicit sQLContext: SQLContext): DataFrame = {
     val res1 = topProjectsByLangRepo(s3FileHandle(idx1))
     val res2 = topProjectsByLangRepo(s3FileHandle(idx2))
-    res1.unionAll(res2).dropDuplicates(Array("name"))
+    res1.unionAll(res2)
   }
 
   def topProjects(implicit sqlContext: SQLContext) = {
@@ -65,23 +64,23 @@ trait TopProjectQuery {
 
     val res34 = unionResult(2,3)
 
-    val res1234 = res12.unionAll(res34).dropDuplicates(Array("name"))
+    val res1234 = res12.unionAll(res34)
 
     val res56 = unionResult(4,5)
 
     val res78 = unionResult(6,7)
 
-    val res5678 = res56.unionAll(res78).dropDuplicates(Array("name"))
+    val res5678 = res56.unionAll(res78)
 
     val res910 = unionResult(8,9)
 
     val res1112 = unionResult(10,11)
 
-    val res912 = res910.unionAll(res1112).dropDuplicates(Array("name"))
+    val res912 = res910.unionAll(res1112)
 
-    val inter = res1234.unionAll(res5678).dropDuplicates(Array("name"))
+    val inter = res1234.unionAll(res5678)
 
-    val rez = inter.unionAll(res912).dropDuplicates(Array("name"))
+    val rez = inter.unionAll(res912)
     val grpRes =  rez.groupBy(TOPREPOS_NAME_COLUMN,TOPREPOS_EVENTSTOTAL_COLUMN,
       TOPREPOS_DATE_COLUMN,TOPREPOS_LANGUAGE_COLUMN).agg(sum(TOPREPOS_EVENTSTOTAL_COLUMN).as("ir"))
 
