@@ -15,7 +15,7 @@ object GitDiscover {
     val conf = new SparkConf(true)
                 .set("spark.executor.memory", "14g")
                 .set("spark.driver.memory", "14g")
-                .set("sandeep-cassandra-cluster:git/spark.cassandra.input.split.size_in_mb","64")
+                .set("sandeep-cassandra-cluster:git/spark.cassandra.input.split.size_in_mb","128")
                 .set("spark.cassandra.connection.host","172.31.2.69")
                 .setAppName("GitDiscover")
 
@@ -35,6 +35,10 @@ object GitDiscover {
       }
       if (!config.getBoolean("job.name.repotimeseries.status")) {
         gitMetrics.repoTimeSeries(sqlContext)
+      }
+
+      if (!config.getBoolean("job.name.popularrepos.status")) {
+        gitMetrics.popularprojects(sqlContext)
       }
 
       if (!config.getBoolean("job.name.userstats")) {
