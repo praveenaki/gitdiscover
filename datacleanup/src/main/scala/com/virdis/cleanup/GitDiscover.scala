@@ -31,13 +31,17 @@ object GitDiscover {
 
     try {
       if (!config.getBoolean("job.name.topproject.status")) {
+        println("========== TOPPROJECTS JOB ============")
         gitMetrics.topProjects(sqlContext)
       }
       if (!config.getBoolean("job.name.repotimeseries.status")) {
+        println("=========== REPOTIMESERIES JOB ============")
         gitMetrics.repoTimeSeries(sqlContext)
       }
 
       if (!config.getBoolean("job.name.popularrepos.status")) {
+        println("=========== POPULAR JOB ============")
+
         gitMetrics.popularprojects(sqlContext)
       }
 
