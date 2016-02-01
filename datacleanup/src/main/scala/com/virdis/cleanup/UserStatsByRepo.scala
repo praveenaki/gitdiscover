@@ -1,47 +1,45 @@
 package com.virdis.cleanup
 
 import com.virdis.cleanup.Constants._
-import org.apache.spark.sql.{SQLContext, GroupedData, DataFrame}
+import org.apache.spark.sql.{SaveMode, Row, SQLContext, DataFrame}
+import org.apache.spark.sql.functions._
 /**
   * Created by sandeep on 1/27/16.
   */
 
-case class UserStats(projectName:String, username: String, activity: Long)
+
+
+case class UserRepoStats(projectname: String, username: String, eventtype: String, count: Long)
 
 trait UserStatsByRepo {
 
   self: CommonDataFunctions =>
 
-  def userStatsByRepoName(df: DataFrame, reponame: String, login: String)(implicit sQLContext: SQLContext) = {
+  def userStatsByRepoName(df: DataFrame)(implicit sQLContext: SQLContext) = {
+    val repoLangDF = repoAndLanguageDF(df)
 
-    val jrez = joinDataWithTopRepos(df)
-    val reponamelogin = jrez.select( jrez(NAME_COLUMN),jrez(USER_LOGIN_COLUMN) )
-    var usernLogin  = List.empty[(String,String)]
+    val combinedDF = df.select(
+      df(REPO_NAME_COLUMN).as(NAME_COLUMN),
+      df(USER_LOGIN_COLUMN).as(USER_REPO_USERNAME_COLUMN),
+      df(EVENT_TYPE).as(USER_REPO_EVENT_TYPE)
+    ).join(repoLangDF, NAME_COLUMN).persist()
 
-    reponamelogin.foreach(r => usernLogin = (r.getAs[String](0), r.getAs[String](1)) +: usernLogin)
 
-    val result = usernLogin.foldLeft(List.empty[UserStats]) { (acc, rnunTup) =>
-      val totalUserActivity = ALL_EVENTS.foldLeft(0L)((b,a) => countByEvent(jrez, rnunTup._1, rnunTup._2, a))
-      UserStats(rnunTup._1, rnunTup._2, totalUserActivity) +: acc
+    val res = combinedDF.map {
+      row =>
+        ((row.getAs[String](NAME_COLUMN), row.getAs[String](USER_REPO_USERNAME_COLUMN), row.getAs[String](USER_REPO_EVENT_TYPE)), 1L)
+    }.groupByKey()
 
+    var stats = List.empty[UserRepoStats]
+    res.foreach(r => stats = UserRepoStats(r._1._1, r._1._2, r._1._3, r._2.reduce(_ + _)) +: stats)
+
+    sQLContext.createDataFrame(stats).write.format("org.apache.spark.sql.cassandra")
+      .options(Map("table" -> "useractivity", "keyspace" -> "git")).mode(SaveMode.Append).save()
+  }
+
+  def useractivity(implicit sQLContext: SQLContext) = {
+    S3_FILENAMES.zipWithIndex.foreach {
+      case(_, idx) => userStatsByRepoName(s3FileHandle(idx))
     }
-    // save result to
-
   }
-
-  def countByEvent(df: DataFrame, reponame: String, login: String, eventType: String): Long = {
-    df.filter(df(REPO_NAME_COLUMN) === reponame && df(USER_LOGIN_COLUMN) === login && df(EVENT_TYPE) === eventType).count()
-
-  }
-
-  def joinDataWithTopRepos(df: DataFrame)(implicit sQLContext: SQLContext) = {
-    val top200NameAndLang = getData(sQLContext)
-
-    val selectedColsDF = df.select(
-      df(REPO_NAME_COLUMN).as(NAME_COLUMN), df(USER_LOGIN_COLUMN), df(EVENT_TYPE)
-    )
-    selectedColsDF.join(top200NameAndLang, NAME_COLUMN)
-  }
-
-
 }

@@ -52,6 +52,11 @@ object Constants {
   val TOPREPOS_LANGUAGE_COLUMN = "language"
   val TOPREPOS_EVENTTOTAL_SUM_COLUMN = "sum(eventstotal)"
 
+  val USER_REPO_STATS_NAME_COLUMN = "projectname"
+  val USER_REPO_USERNAME_COLUMN = "username"
+  val USER_REPO_EVENT_TYPE = "eventttype"
+  val USER_REPO_ACTIVITY_COUNT = "count"
+
   val LIMIT = 200
 
   ///// SCHEMA /////
