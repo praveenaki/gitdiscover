@@ -1,15 +1,12 @@
 package com.virdis.cleanup
 
 import com.virdis.cleanup.Constants._
+import org.apache.spark.sql.types.{LongType, StringType, StructField, StructType}
 import org.apache.spark.sql.{SaveMode, Row, SQLContext, DataFrame}
-import org.apache.spark.sql.functions._
 /**
   * Created by sandeep on 1/27/16.
   */
 
-
-
-case class UserRepoStats(projectname: String, username: String, eventtype: String, count: Long)
 
 trait UserStatsByRepo {
 
@@ -30,10 +27,26 @@ trait UserStatsByRepo {
         ((row.getAs[String](NAME_COLUMN), row.getAs[String](USER_REPO_USERNAME_COLUMN), row.getAs[String](USER_REPO_EVENT_TYPE)), 1L)
     }.groupByKey()
 
-    var stats = List.empty[UserRepoStats]
-    res.foreach(r => stats = UserRepoStats(r._1._1, r._1._2, r._1._3, r._2.reduce(_ + _)) +: stats)
+    val rows = res.map {
+      r =>
+        Row(
+          r._1._1,
+          r._1._2,
+          r._1._3,
+          r._2.toList.reduce(_ + _)
+        )
+    }
 
-    sQLContext.createDataFrame(stats).write.format("org.apache.spark.sql.cassandra")
+    val finalRes = sQLContext.createDataFrame(rows, new StructType(
+      Array(
+        StructField("projectname", StringType),
+        StructField("username", StringType),
+        StructField("eventtype", StringType),
+        StructField("count", LongType)
+      )
+    ))
+
+    finalRes.write.format("org.apache.spark.sql.cassandra")
       .options(Map("table" -> "useractivity", "keyspace" -> "git")).mode(SaveMode.Append).save()
   }
 
