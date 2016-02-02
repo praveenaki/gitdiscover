@@ -26,7 +26,7 @@ object GitDiscover {
     val config = ConfigFactory.load()
 
 
-    object gitMetrics extends TopProjectQuery with RepoTimeSeries with CommonDataFunctions
+    object gitMetrics extends TopProjectQuery with RepoTimeSeries with UserStatsByRepo with CommonDataFunctions
 
 
     try {
@@ -40,7 +40,8 @@ object GitDiscover {
       }
 
       if (!config.getBoolean("job.name.userstats")) {
-
+        println("=========== USER ACTIVITY JOB ============")
+        gitMetrics.useractivity(sqlContext)
       }
 
     } catch {
