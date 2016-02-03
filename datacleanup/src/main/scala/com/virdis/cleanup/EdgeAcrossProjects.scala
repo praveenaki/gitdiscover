@@ -25,7 +25,7 @@ trait EdgeAcrossProjects {
 
     val userActivityDF = sQLContext.read
                           .format("org.apache.spark.sql.cassandra")
-                          .options(Map( "table" -> "repostats", "keyspace" -> "git" ))
+                          .options(Map( "table" -> "useractivity", "keyspace" -> "git" ))
                           .load()
 
     val joinedRepo = repostatsDF.select(
