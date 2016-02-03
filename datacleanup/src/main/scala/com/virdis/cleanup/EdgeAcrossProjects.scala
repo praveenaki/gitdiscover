@@ -15,7 +15,17 @@ trait EdgeAcrossProjects {
   val eventype = "eventtype"
   val lang = "language"
 
-  def findEdge(repostatsDF: DataFrame, userActivityDF: DataFrame)(implicit sQLContext: SQLContext) = {
+  def findEdge(implicit sQLContext: SQLContext) = {
+
+    val repostatsDF = sQLContext.read
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map( "table" -> "repostats", "keyspace" -> "git" ))
+      .load()
+
+    val userActivityDF = sQLContext.read
+      .format("org.apache.spark.sql.cassandra")
+      .options(Map( "table" -> "useractivity", "keyspace" -> "git" ))
+      .load()
 
     val joinedRepo = repostatsDF.select(
                         repostatsDF(projName),
