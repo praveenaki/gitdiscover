@@ -51,7 +51,7 @@ trait EdgeAcrossProjects {
           row.getAs[String](eventype),
           row.getAs[String](lang),
           row.getAs[String](userActivityRepo),
-          row.getAs[Int]("count"),
+          row.getAs[Integer]("count"),
           java.util.UUID.randomUUID().toString
 
         )
