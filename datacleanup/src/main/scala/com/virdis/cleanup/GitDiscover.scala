@@ -26,7 +26,12 @@ object GitDiscover {
     val config = ConfigFactory.load()
 
 
-    object gitMetrics extends TopProjectQuery with RepoTimeSeries with UserStatsByRepo with CommonDataFunctions
+    object gitMetrics extends
+          TopProjectQuery
+      with RepoTimeSeries
+      with UserStatsByRepo
+      with EdgeAcrossProjects
+      with CommonDataFunctions
 
 
     try {
@@ -42,6 +47,11 @@ object GitDiscover {
       if (!config.getBoolean("job.name.userstats")) {
         println("=========== USER ACTIVITY JOB ============")
         gitMetrics.useractivity(sqlContext)
+      }
+
+      if (!config.getBoolean("job.name.findedges")) {
+        println("=========== FIND EDGES JOB ============")
+        gitMetrics.findEdge(sqlContext)
       }
 
     } catch {
