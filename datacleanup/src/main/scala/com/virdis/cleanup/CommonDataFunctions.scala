@@ -15,7 +15,7 @@ trait CommonDataFunctions {
    */
 
   def s3FileHandle(idx: Int)(implicit sqlContext: SQLContext) = {
-    sqlContext.read.json(S3_FILENAMES(idx)).repartition(120)
+    sqlContext.read.json(S3_FILENAMES(idx))
   }
 
   def repoAndLanguageDF(df: DataFrame)(implicit sqlContext: SQLContext): DataFrame = {
