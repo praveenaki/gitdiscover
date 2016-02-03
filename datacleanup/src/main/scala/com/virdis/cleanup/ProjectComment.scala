@@ -12,7 +12,7 @@ trait ProjectComment {
 
   self: CommonDataFunctions =>
 
-  def extractComments(df: DataFrame)(sQLContext: SQLContext) = {
+  def extractComments(df: DataFrame)(implicit sQLContext: SQLContext) = {
 
     val commitEvnts = getDataByEventType(df, COMMIT_COMMENT_EVENT)
     val commitCommentsDF = commitEvnts.select(
