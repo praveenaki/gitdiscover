@@ -39,7 +39,7 @@ trait ProjectComment {
     val pushEvents = getDataByEventType(df, PUSH_EVENT)
     val pushEvtsDF = pushEvents.select( pushEvents(REPO_NAME_COLUMN), pushEvents("payload.commits")).persist()
 
-    val peComments = explode(pushEvtsDF("commits.message")))
+    val peComments = explode(pushEvtsDF("commits.message"))
 
   }
 }

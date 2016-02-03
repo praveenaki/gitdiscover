@@ -1,7 +1,7 @@
 package com.virdis.cleanup
 
-import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
-import org.apache.spark.sql.{SaveMode, Row, SQLContext}
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.{DataFrame, SaveMode, Row, SQLContext}
 import Constants._
 /**
   * Created by sandeep on 2/1/16.
@@ -17,16 +17,7 @@ trait EdgeAcrossProjects {
   val eventype = "eventtype"
   val lang = "language"
 
-  def findEdge(sQLContext: SQLContext) = {
-    val repostatsDF = sQLContext.read
-                      .format("org.apache.spark.sql.cassandra")
-                      .options(Map( "table" -> "repostats", "keyspace" -> "git" ))
-                      .load()
-
-    val userActivityDF = sQLContext.read
-                          .format("org.apache.spark.sql.cassandra")
-                          .options(Map( "table" -> "useractivity", "keyspace" -> "git" ))
-                          .load()
+  def findEdge(repostatsDF: DataFrame, userActivityDF: DataFrame)(implicit sQLContext: SQLContext) = {
 
     val joinedRepo = repostatsDF.select(
                         repostatsDF(projName),
@@ -51,7 +42,7 @@ trait EdgeAcrossProjects {
           row.getAs[String](eventype),
           row.getAs[String](lang),
           row.getAs[String](userActivityRepo),
-          row.getAs[Integer]("count"),
+          row.getAs[Long]("count"),
           java.util.UUID.randomUUID().toString
 
         )
@@ -64,7 +55,7 @@ trait EdgeAcrossProjects {
         StructField(eventype, StringType),
         StructField(lang, StringType),
         StructField(userActivityRepo, StringType),
-        StructField("count", IntegerType),
+        StructField("count", LongType),
         StructField("sorter", StringType)
       )
     ))
