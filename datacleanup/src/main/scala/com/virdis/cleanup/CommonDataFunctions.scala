@@ -30,7 +30,7 @@ trait CommonDataFunctions {
       .read
       .format("org.apache.spark.sql.cassandra")
       .options(Map( "table" -> "popularrepos", "keyspace" -> "git" ))
-      .load().limit(LIMIT)
+      .load()
 
     df.select( df(NAME_COLUMN), df(LANGUAGE_COLUMN) )
 
