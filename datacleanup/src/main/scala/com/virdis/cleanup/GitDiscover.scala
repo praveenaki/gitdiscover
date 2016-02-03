@@ -26,7 +26,13 @@ object GitDiscover {
     val config = ConfigFactory.load()
 
 
-    object gitMetrics extends TopProjectQuery with RepoTimeSeries with UserStatsByRepo with EdgeAcrossProjects with CommonDataFunctions
+    object gitMetrics
+      extends TopProjectQuery
+        with RepoTimeSeries
+        with UserStatsByRepo
+        with EdgeAcrossProjects
+        with ProjectComment
+        with CommonDataFunctions
 
 
     try {
@@ -45,18 +51,13 @@ object GitDiscover {
       }
 
       if (!config.getBoolean("job.name.findedges")) {
-        println("=========== FIND EDGES JOB ============")
-        val repostatsDF = sqlContext.read
-          .format("org.apache.spark.sql.cassandra")
-          .options(Map( "table" -> "repostats", "keyspace" -> "git" ))
-          .load()
+        println("=========== FIND EDGES JOB ===============")
+        gitMetrics.findEdge(sqlContext)
+      }
 
-        val userActivityDF = sqlContext.read
-          .format("org.apache.spark.sql.cassandra")
-          .options(Map( "table" -> "useractivity", "keyspace" -> "git" ))
-          .load()
-
-        gitMetrics.findEdge(repostatsDF, userActivityDF)(sqlContext)
+      if (!config.getBoolean("job.name.comments")) {
+        println("=========== COMMENTS JOB =================")
+        gitMetrics.projectComments(sqlContext)
       }
 
     } catch {
