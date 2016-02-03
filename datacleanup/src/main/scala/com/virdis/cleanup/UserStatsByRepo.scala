@@ -16,37 +16,13 @@ trait UserStatsByRepo {
     val repoLangDF = repoAndLanguageDF(df)
 
     val combinedDF = df.select(
-      df(REPO_NAME_COLUMN).as(NAME_COLUMN),
-      df(USER_LOGIN_COLUMN).as(USER_REPO_USERNAME_COLUMN),
-      df(EVENT_TYPE).as(USER_REPO_EVENT_TYPE)
+      df(REPO_NAME_COLUMN).as(REPOSTATS_NAME),
+      df(USER_LOGIN_COLUMN).as(USER_REPO_USERNAME_COLUMN)
     ).join(repoLangDF, NAME_COLUMN).persist()
 
+    val activityCount = combinedDF.groupBy(combinedDF(REPOSTATS_NAME), combinedDF(USER_REPO_USERNAME_COLUMN)).count()
 
-    val res = combinedDF.map {
-      row =>
-        ((row.getAs[String](NAME_COLUMN), row.getAs[String](USER_REPO_USERNAME_COLUMN), row.getAs[String](USER_REPO_EVENT_TYPE)), 1L)
-    }.groupByKey()
-
-    val rows = res.map {
-      r =>
-        Row(
-          r._1._1,
-          r._1._2,
-          r._1._3,
-          r._2.toList.reduce(_ + _)
-        )
-    }
-
-    val finalRes = sQLContext.createDataFrame(rows, new StructType(
-      Array(
-        StructField("projectname", StringType),
-        StructField("username", StringType),
-        StructField("eventtype", StringType),
-        StructField("count", LongType)
-      )
-    ))
-
-    finalRes.write.format("org.apache.spark.sql.cassandra")
+    activityCount.write.format("org.apache.spark.sql.cassandra")
       .options(Map("table" -> "useractivity", "keyspace" -> "git")).mode(SaveMode.Append).save()
   }
 
