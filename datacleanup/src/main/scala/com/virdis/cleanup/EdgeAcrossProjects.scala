@@ -8,8 +8,6 @@ import Constants._
   */
 trait EdgeAcrossProjects {
 
-  self: CommonDataFunctions =>
-
   val userActivityRepo = "useractivityrepo"
   val username = "username"
   val projName = "projectname"
@@ -35,6 +33,8 @@ trait EdgeAcrossProjects {
     val filterdJoin = joinedRepo.filter( joinedRepo(projName) !== joinedRepo(userActivityRepo) ).persist()
 
     val ir = filterdJoin.map {
+      val uuid =  java.util.UUID.randomUUID().toString
+
       row =>
         Row(
           row.getAs[String](username),
@@ -43,8 +43,7 @@ trait EdgeAcrossProjects {
           row.getAs[String](lang),
           row.getAs[String](userActivityRepo),
           row.getAs[Long]("count"),
-          java.util.UUID.randomUUID().toString
-
+          uuid
         )
     }
 
