@@ -57,7 +57,8 @@ object Constants {
   val USER_REPO_EVENT_TYPE = "eventttype"
   val USER_REPO_ACTIVITY_COUNT = "count"
 
-  val LIMIT = 200
+  val PROJECT_COMMENTS_PROJ_NAME_COLUMN = "projectname"
+  val PROJECT_COMMENTS_COMMENT_COLUMN = "comment"
 
   ///// SCHEMA /////
  // val CREATED_DATE_TIME = DateTimeFormat.forPattern("MM/dd/yyyy")
