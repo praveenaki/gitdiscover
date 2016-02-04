@@ -19,7 +19,8 @@ trait UserStatsByRepo {
       df(REPO_NAME_COLUMN).as(REPOSTATS_NAME),
       df(USER_LOGIN_COLUMN).as(USER_REPO_USERNAME_COLUMN)
     ).join(repoLangDF.select(
-      repoLangDF(REPO_NAME_COLUMN).as(REPOSTATS_NAME)
+      repoLangDF("name").as(REPOSTATS_NAME),
+      repoLangDF("language")
     ), REPOSTATS_NAME).persist()
 
     val activityCount = combinedDF.groupBy(combinedDF(REPOSTATS_NAME), combinedDF(USER_REPO_USERNAME_COLUMN)).count()
