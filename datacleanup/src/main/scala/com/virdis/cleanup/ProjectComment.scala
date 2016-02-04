@@ -20,7 +20,7 @@ trait ProjectComment {
       commitEvnts(COMMIT_COMMENT_COLUMN).as(PROJECT_COMMENTS_COMMENT_COLUMN)
     ).persist()
 
-    updateDataframeAndSave(commitCommentsDF)
+    val res1 = updateDataframeAndSave(commitCommentsDF)
 
     val pullReqCommentReviewEvent =  getDataByEventType(df, PULL_REQUEST_COMMENT_REVIEW_EVENT)
 
@@ -30,7 +30,7 @@ trait ProjectComment {
           pullReqCommentReviewEvent(PULL_REQ_COMMENT_REVIEW_COMMENT_COLUMN).as(PROJECT_COMMENTS_COMMENT_COLUMN)
          ).persist()
 
-    updateDataframeAndSave(pullRCRFirstDF)
+    val res2 = updateDataframeAndSave(pullRCRFirstDF)
 
     val pullRERSecondDF = pullReqCommentReviewEvent
       .filter(pullReqCommentReviewEvent("payload.pull_request.body").isNotNull)
@@ -38,7 +38,7 @@ trait ProjectComment {
         pullReqCommentReviewEvent("payload.pull_request.body").as(PROJECT_COMMENTS_COMMENT_COLUMN)
       ).persist()
 
-    updateDataframeAndSave(pullRERSecondDF)
+    val res3 = updateDataframeAndSave(pullRERSecondDF)
 
     val issueCommentEvents = getDataByEventType(df, ISSUE_COMMENT_EVENT)
 
@@ -48,7 +48,7 @@ trait ProjectComment {
         issueCommentEvents(ISSUES_COMMENT_COLUMN).as(PROJECT_COMMENTS_COMMENT_COLUMN)
       ).persist()
 
-    updateDataframeAndSave(issueCommentEvntFirstDF)
+    val res4 = updateDataframeAndSave(issueCommentEvntFirstDF)
 
 
     val issueCommentEvntSecondDF = issueCommentEvents.filter(issueCommentEvents("payload.comment.body").isNotNull)
@@ -57,7 +57,7 @@ trait ProjectComment {
                                       issueCommentEvents("payload.comment.body").as(PROJECT_COMMENTS_COMMENT_COLUMN)
                                     ).persist()
 
-    updateDataframeAndSave(issueCommentEvntSecondDF)
+    val res5 = updateDataframeAndSave(issueCommentEvntSecondDF)
 
     val prEvent = getDataByEventType(df, PULL_REQUEST_EVENT)
     val pullReqEventsDF = prEvent.select(
@@ -65,7 +65,7 @@ trait ProjectComment {
       prEvent(PULL_REQ_COMMENT_COLUMN ).as(PROJECT_COMMENTS_COMMENT_COLUMN)
     ).persist()
 
-    updateDataframeAndSave(pullReqEventsDF)
+    val res6 = updateDataframeAndSave(pullReqEventsDF)
 
     val pushEvents = getDataByEventType(df, PUSH_EVENT)
     val pushEvtsDF = pushEvents.select(
@@ -79,11 +79,19 @@ trait ProjectComment {
      */
     val allPEComments = pushEvtsDF.explode("commits.message", PROJECT_COMMENTS_COMMENT_COLUMN){s: Seq[String] => s}
 
-    updateDataframeAndSave(allPEComments)
+    val res7 = updateDataframeAndSave(allPEComments)
 
+    val res12 = res1.unionAll(res2)
+    val res34 = res3.unionAll(res4)
+    val res56 = res5.unionAll(res6)
+    val res14 = res12.unionAll(res34)
+    val res57 = res56.unionAll(res7)
+
+    res14.unionAll(res57).write.format("org.apache.spark.sql.cassandra")
+      .options(Map("table" -> "projectcomments", "keyspace" -> "git")).mode(SaveMode.Append).save()
   }
 
-  def updateDataframeAndSave(df: DataFrame)(implicit sQLContext: SQLContext) = {
+  def updateDataframeAndSave(df: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
     val ir = df.map {
       val srt =  java.util.UUID.randomUUID().toString
 
@@ -100,8 +108,7 @@ trait ProjectComment {
         StructField(PROJECT_COMMENTS_COMMENT_COLUMN, StringType),
         StructField("sorter", StringType)
       )
-    )).write.format("org.apache.spark.sql.cassandra")
-      .options(Map("table" -> "projectcomments", "keyspace" -> "git")).mode(SaveMode.Append).save()
+    ))
   }
 
   def projectComments(implicit sQLContext: SQLContext) = {
