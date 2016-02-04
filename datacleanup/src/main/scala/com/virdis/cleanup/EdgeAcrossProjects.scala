@@ -41,7 +41,7 @@ trait EdgeAcrossProjects {
     val filterdJoin = joinedRepo.filter( joinedRepo(projName) !== joinedRepo(userActivityRepo) ).persist()
 
     val ir = filterdJoin.map {
-      val uuid =  java.util.UUID.randomUUID().toString
+      val snonce =  java.util.UUID.randomUUID().toString
 
       row =>
         Row(
@@ -50,7 +50,7 @@ trait EdgeAcrossProjects {
           row.getAs[String](eventype),
           row.getAs[String](userActivityRepo),
           row.getAs[Long]("count"),
-          uuid
+          snonce
         )
     }
 

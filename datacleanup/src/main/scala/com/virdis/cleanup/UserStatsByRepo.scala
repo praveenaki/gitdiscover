@@ -25,16 +25,17 @@ trait UserStatsByRepo {
 
     val res = combinedDF.map {
       row =>
-        ((row.getAs[String](REPOSTATS_NAME), row.getAs[String](USER_REPO_USERNAME_COLUMN), row.getAs[String](EVENT_TYPE)), 1L)
+        ((row.getAs[String](REPOSTATS_NAME), row.getAs[String](USER_REPO_USERNAME_COLUMN)), 1L)
     }.groupByKey()
 
     val rows = res.map {
+      val snonce =  java.util.UUID.randomUUID().toString
       r =>
         Row(
           r._1._1,
           r._1._2,
-          r._1._3,
-          r._2.toList.sum[Long]
+          r._2.toList.sum[Long],
+          snonce
         )
     }
 
@@ -42,8 +43,8 @@ trait UserStatsByRepo {
       Array(
         StructField("projectname", StringType),
         StructField("username", StringType),
-        StructField("eventtype", StringType),
-        StructField("count", LongType)
+        StructField("count", LongType),
+        StructField("sorter", StringType)
       )
     ))
 
