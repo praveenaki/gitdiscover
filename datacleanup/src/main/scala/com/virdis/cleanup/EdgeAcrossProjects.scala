@@ -13,7 +13,6 @@ trait EdgeAcrossProjects {
   val projName = "projectname"
   val eventcommitter = "eventcommitter"
   val eventype = "eventtype"
-  val lang = "language"
 
   def findEdge(implicit sQLContext: SQLContext) = {
 
@@ -30,8 +29,7 @@ trait EdgeAcrossProjects {
     val joinedRepo = repostatsDF.select(
                         repostatsDF(projName),
                         repostatsDF(eventcommitter).as(username),
-                        repostatsDF(eventype),
-                        repostatsDF(lang)
+                        repostatsDF(eventype)
                       ).join(
                         userActivityDF.select(
                           userActivityDF("projectname").as(userActivityRepo),
@@ -50,7 +48,6 @@ trait EdgeAcrossProjects {
           row.getAs[String](username),
           row.getAs[String](projName),
           row.getAs[String](eventype),
-          row.getAs[String](lang),
           row.getAs[String](userActivityRepo),
           row.getAs[Long]("count"),
           uuid
@@ -62,7 +59,6 @@ trait EdgeAcrossProjects {
         StructField(username, StringType),
         StructField(projName, StringType),
         StructField(eventype, StringType),
-        StructField(lang, StringType),
         StructField(userActivityRepo, StringType),
         StructField("count", LongType),
         StructField("sorter", StringType)
