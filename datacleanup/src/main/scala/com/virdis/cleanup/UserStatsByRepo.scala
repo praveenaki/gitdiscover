@@ -54,16 +54,17 @@ trait UserStatsByRepo {
         StructField("count", LongType),
         StructField("id", StringType)
       )
-    )).persist()
+    ))
 
 
   }
 
   def useractivity(implicit sQLContext: SQLContext) = {
     val allDFs = (0 until 12).toList.map(i => commonColumns(s3FileHandle(i)))
-    val finalRes = allDFs.reduce(_ unionAll(_))
+    val res = allDFs.reduce(_ unionAll(_))
 
-    userStatsByRepoName(finalRes).write.format("org.apache.spark.sql.cassandra")
+    val finalRes = userStatsByRepoName(res)
+      finalRes.write.format("org.apache.spark.sql.cassandra")
       .options(Map("table" -> "useractivity", "keyspace" -> "git")).mode(SaveMode.Append).save()
   }
 }

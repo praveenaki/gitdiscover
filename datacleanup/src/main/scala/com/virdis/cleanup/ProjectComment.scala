@@ -3,7 +3,6 @@ package com.virdis.cleanup
 import com.virdis.cleanup.Constants._
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{SaveMode, Row, SQLContext, DataFrame}
-import org.apache.spark.sql.functions.explode
 
 /**
   * Created by sandeep on 2/2/16.
