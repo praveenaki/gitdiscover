@@ -12,17 +12,21 @@ trait UserStatsByRepo {
 
   self: CommonDataFunctions =>
 
-  def userStatsByRepoName(df: DataFrame)(implicit sQLContext: SQLContext) = {
-
-    val combinedDF = df.select(
+  def commonColumns(df: DataFrame): DataFrame = {
+    df.select(
       df(REPO_NAME_COLUMN).as(REPOSTATS_NAME),
       df(USER_LOGIN_COLUMN).as(USER_REPO_USERNAME_COLUMN),
       df(EVENT_TYPE)
 
     ).persist()
 
+  }
 
-    val res = combinedDF.map {
+  def userStatsByRepoName(filteredDF: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
+
+
+
+    val res = filteredDF.map {
       row =>
         ((row.getAs[String](REPOSTATS_NAME),
           row.getAs[String](USER_REPO_USERNAME_COLUMN),
@@ -40,22 +44,23 @@ trait UserStatsByRepo {
         )
     }
 
-    val finalRes = sQLContext.createDataFrame(rows, new StructType(
+    sQLContext.createDataFrame(rows, new StructType(
       Array(
         StructField("projectname", StringType),
         StructField("username", StringType),
         StructField("eventtype", StringType),
         StructField("count", LongType)
       )
-    ))
+    )).persist()
 
-    finalRes.write.format("org.apache.spark.sql.cassandra")
-      .options(Map("table" -> "useractivity", "keyspace" -> "git")).mode(SaveMode.Append).save()
+
   }
 
   def useractivity(implicit sQLContext: SQLContext) = {
-    S3_FILENAMES.zipWithIndex.foreach {
-      case(_, idx) => userStatsByRepoName(s3FileHandle(idx))
-    }
+    val allDFs = (0 until 12).toList.map(i => commonColumns(s3FileHandle(i)))
+    val finalRes = allDFs.reduce(_ unionAll(_))
+
+    userStatsByRepoName(finalRes).write.format("org.apache.spark.sql.cassandra")
+      .options(Map("table" -> "useractivity", "keyspace" -> "git")).mode(SaveMode.Append).save()
   }
 }
