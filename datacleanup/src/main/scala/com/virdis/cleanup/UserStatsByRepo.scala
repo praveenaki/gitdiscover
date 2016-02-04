@@ -13,7 +13,6 @@ trait UserStatsByRepo {
   self: CommonDataFunctions =>
 
   def userStatsByRepoName(df: DataFrame)(implicit sQLContext: SQLContext) = {
-    val repoLangDF = repoAndLanguageDF(df)
 
     val combinedDF = df.select(
       df(REPO_NAME_COLUMN).as(REPOSTATS_NAME),
@@ -25,17 +24,19 @@ trait UserStatsByRepo {
 
     val res = combinedDF.map {
       row =>
-        ((row.getAs[String](REPOSTATS_NAME), row.getAs[String](USER_REPO_USERNAME_COLUMN)), 1L)
+        ((row.getAs[String](REPOSTATS_NAME),
+          row.getAs[String](USER_REPO_USERNAME_COLUMN),
+          row.getAs[String](EVENT_TYPE)), 1L)
     }.groupByKey()
 
+
     val rows = res.map {
-      val snonce =  java.util.UUID.randomUUID().toString
       r =>
         Row(
           r._1._1,
           r._1._2,
-          r._2.toList.sum[Long],
-          snonce
+          r._1._3,
+          r._2.toList.sum[Long]
         )
     }
 
@@ -43,8 +44,8 @@ trait UserStatsByRepo {
       Array(
         StructField("projectname", StringType),
         StructField("username", StringType),
-        StructField("count", LongType),
-        StructField("sorter", StringType)
+        StructField("eventtype", StringType),
+        StructField("count", LongType)
       )
     ))
 
