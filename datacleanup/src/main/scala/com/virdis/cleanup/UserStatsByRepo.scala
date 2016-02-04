@@ -35,12 +35,14 @@ trait UserStatsByRepo {
 
 
     val rows = res.map {
+      val id = java.util.UUID.randomUUID().toString
       r =>
         Row(
           r._1._1,
           r._1._2,
           r._1._3,
-          r._2.toList.sum[Long]
+          r._2.toList.sum[Long],
+          id
         )
     }
 
@@ -49,7 +51,8 @@ trait UserStatsByRepo {
         StructField("projectname", StringType),
         StructField("username", StringType),
         StructField("eventtype", StringType),
-        StructField("count", LongType)
+        StructField("count", LongType),
+        StructField("id", StringType)
       )
     )).persist()
 
