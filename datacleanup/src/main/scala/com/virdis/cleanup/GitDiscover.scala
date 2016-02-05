@@ -32,7 +32,7 @@ object GitDiscover {
         with UserStatsByRepo
         with EdgeAcrossProjects
         with ProjectComment
-        with CommonDataFunctions
+        with CommonDataFunctions with Serializable
 
 
     try {

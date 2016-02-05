@@ -26,21 +26,33 @@ trait EdgeAcrossProjects {
       .options(Map( "table" -> "useractivity", "keyspace" -> "git" ))
       .load()
 
-    val joinedRepo = repostatsDF.select(
-                        repostatsDF(projName),
-                        repostatsDF(eventcommitter).as(username),
-                        repostatsDF(eventype)
-                      ).join(
-                        userActivityDF.select(
-                          userActivityDF("projectname").as(userActivityRepo),
-                          userActivityDF(username),
-                          userActivityDF("count")
-                        ), username
-                      ).persist()
 
-    val filterdJoin = joinedRepo.filter( joinedRepo(projName) !== joinedRepo(userActivityRepo) ).persist()
+    val filteredRSDF = repostatsDF.select(
+                          repostatsDF(projName),
+                          repostatsDF(eventcommitter).as(username),
+                          repostatsDF(eventype)
+                        )
 
-    val ir = filterdJoin.map {
+   val filteredUADF = userActivityDF.select(
+                         userActivityDF("projectname").as(userActivityRepo),
+                         userActivityDF(username),
+                         userActivityDF("count")
+                       )
+
+
+    val joinedRepo = filteredRSDF.filter(
+      !filteredRSDF(projName).contains(username) &&
+        filteredRSDF(EVENT_TYPE) === PULL_REQUEST_EVENT &&
+        filteredRSDF(EVENT_TYPE) === COMMIT_COMMENT_EVENT &&
+        filteredRSDF(EVENT_TYPE) === PUSH_EVENT &&
+        filteredRSDF(EVENT_TYPE) === ISSUE_COMMENT_EVENT
+    )
+      .join(
+          filteredUADF.filter(!filteredUADF(userActivityRepo).contains(filteredUADF(username))), username
+      ).persist()
+
+    val ir = joinedRepo.map {
+      val id = java.util.UUID.randomUUID()
       row =>
         Row(
           row.getAs[String](username),
@@ -48,7 +60,7 @@ trait EdgeAcrossProjects {
           row.getAs[String](eventype),
           row.getAs[String](userActivityRepo),
           row.getAs[Long]("count"),
-          snonce
+          id
         )
     }
 
@@ -67,5 +79,4 @@ trait EdgeAcrossProjects {
       .options(Map("table" -> "edgeinfo", "keyspace" -> "git")).mode(SaveMode.Append).save()
   }
 
-  def snonce = java.util.UUID.randomUUID().toString
 }

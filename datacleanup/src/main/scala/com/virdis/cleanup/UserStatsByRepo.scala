@@ -24,8 +24,6 @@ trait UserStatsByRepo {
 
   def userStatsByRepoName(filteredDF: DataFrame)(implicit sQLContext: SQLContext): DataFrame = {
 
-
-
     val res = filteredDF.map {
       row =>
         ((row.getAs[String](REPOSTATS_NAME),
