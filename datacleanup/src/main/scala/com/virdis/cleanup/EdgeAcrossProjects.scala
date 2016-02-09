@@ -41,11 +41,7 @@ trait EdgeAcrossProjects {
 
 
     val joinedRepo = filteredRSDF.filter(
-      !filteredRSDF(projName).contains(username) &&
-        filteredRSDF(eventype) === PULL_REQUEST_EVENT &&
-        filteredRSDF(eventype) === COMMIT_COMMENT_EVENT &&
-        filteredRSDF(eventype) === PUSH_EVENT &&
-        filteredRSDF(eventype) === ISSUE_COMMENT_EVENT
+      !filteredRSDF(projName).contains(username)
     )
       .join(
           filteredUADF.filter(!filteredUADF(userActivityRepo).contains(filteredUADF(username))), username
