@@ -8,3 +8,12 @@ The motivation for the project came to me from my personal experience from tryin
 
 # Video
 [GitDiscover Video](https://www.youtube.com/watch?v=fr5hm6zOj2c)
+
+# WebLayer
+[Code of Web Layer](https://github.com/virdis/functional-imperative.com)
+
+Since this is my personal blog, I will link to the relevant parts for this project.
+[Controller](https://github.com/virdis/functional-imperative.com/blob/master/app/controllers/GitDiscover.scala)
+[DBSetup](https://github.com/virdis/functional-imperative.com/blob/master/app/database/db.scala)
+[Models](https://github.com/virdis/functional-imperative.com/tree/master/app/models/gitdiscover)
+[Javascript/D3](https://github.com/virdis/functional-imperative.com/tree/master/public/javascripts)
