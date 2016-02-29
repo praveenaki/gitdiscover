@@ -7,7 +7,7 @@ The motivation for the project came to me from my personal experience from tryin
 [GitDiscover](http://www.slideshare.net/mobby1982/gitdiscover)
 
 # Video
-[GitDiscover Video](https://www.youtube.com/watch?v=fr5hm6zOj2c)
+[GitDiscover Video](https://youtu.be/fr5hm6zOj2c?t=14)
 
 # WebLayer
 [Code of Web Layer](https://github.com/virdis/functional-imperative.com)
